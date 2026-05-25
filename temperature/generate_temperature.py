@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-REGISTRAZIONE SETTIMANALE TEMPERATURE
+REGISTRAZIONE GIORNALIERA TEMPERATURE
 Genera/aggiorna il file HTML mensile delle temperature frigo/freezer.
 Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 """
@@ -8,7 +8,7 @@ Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 import os
 import json
 import random
-from datetime import date, datetime, timedelta
+from datetime import date
 import calendar
 
 # ─── Configurazione frighi ────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ def salva_dati(dati: dict):
 def aggiungi_giorno(dati: dict, giorno: date) -> dict:
     chiave = giorno.isoformat()
     if chiave in dati:
-        return dati  # già compilato
+        return dati  # già compilato oggi
 
     riga = {
         "data":    giorno.strftime("%d/%m/%Y"),
@@ -89,7 +89,7 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     for giorno_n in range(1, num_giorni + 1):
         giorno = date(anno, mese, giorno_n)
         chiave = giorno.isoformat()
-        riga = dati.get(chiave)
+        riga   = dati.get(chiave)
 
         if riga:
             data_str   = riga["data"]
@@ -98,192 +98,185 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
                 f'<td class="temp">{riga["temperature"].get(str(f["numero"]), "")}</td>'
                 for f in FRIGHI
             )
-            firma_cell = '<td class="firma"></td>'
-            note_cell  = '<td class="note"></td>'
         else:
             data_str   = giorno.strftime("%d/%m/%Y")
             orario_str = ""
-            celle_temp = "".join('<td class="temp future"></td>' for _ in FRIGHI)
-            firma_cell = '<td class="firma"></td>'
-            note_cell  = '<td class="note"></td>'
+            celle_temp = "".join('<td class="temp vuoto"></td>' for _ in FRIGHI)
 
-        righe_html += f"""
-        <tr>
+        righe_html += f"""<tr>
             <td class="data">{data_str}</td>
             <td class="orario">{orario_str}</td>
             {celle_temp}
-            {firma_cell}
-            {note_cell}
-        </tr>"""
+            <td class="firma"></td>
+            <td class="note"></td>
+          </tr>"""
 
-    # Intestazioni frighi
+    # Intestazioni frighi (compatte)
     intestazioni = ""
     for f in FRIGHI:
-        intestazioni += f"""
-            <th class="frigo-header">
-                <div class="frigo-nome">{f['nome']}</div>
-                <div class="frigo-pos">{f['posizione']}</div>
-                <div class="frigo-rif">Temp rif. {f['temp_rif']}</div>
-            </th>"""
+        intestazioni += f"""<th class="frigo-header">
+            <span class="fn">{f['nome']}</span><br>
+            <span class="fp">{f['posizione']}</span><br>
+            <span class="fr">{f['temp_rif']}</span>
+          </th>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrazione Temperature - {nome_mese} {anno}</title>
+<title>Temperature - {nome_mese} {anno}</title>
 <style>
   @page {{
     size: A4 landscape;
-    margin: 10mm 8mm;
+    margin: 6mm 5mm;
   }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
   body {{
     font-family: Arial, sans-serif;
-    font-size: 7.5pt;
+    font-size: 6pt;
     color: #000;
     background: #fff;
   }}
-  .header-azienda {{
-    text-align: center;
-    margin-bottom: 6px;
-  }}
-  .header-azienda .nome {{
-    font-size: 11pt;
-    font-weight: bold;
-    text-transform: uppercase;
-  }}
-  .header-azienda .sottotitolo {{
-    font-size: 8pt;
-    font-style: italic;
-  }}
-  .doc-info {{
+
+  /* Intestazione azienda */
+  .hdr {{
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 4px;
+    align-items: flex-start;
+    margin-bottom: 1mm;
   }}
-  .doc-info .mod {{ font-size: 7pt; color: #555; }}
-  .titolo-tabella {{
-    font-size: 12pt;
+  .hdr-centro {{ text-align: center; flex: 1; }}
+  .hdr-nome {{
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }}
+  .hdr-sub {{ font-size: 6pt; font-style: italic; color: #333; }}
+  .hdr-mod  {{ font-size: 6pt; color: #666; white-space: nowrap; }}
+
+  /* Titolo */
+  .titolo {{
+    font-size: 9pt;
     font-weight: bold;
     text-align: center;
     text-transform: uppercase;
-    border: 2px solid #000;
-    padding: 4px;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+    border: 1.5px solid #000;
+    padding: 1.5mm 2mm;
+    margin: 1mm 0;
+    letter-spacing: 0.5px;
   }}
   .mese-anno {{
     text-align: center;
-    font-size: 9pt;
+    font-size: 7.5pt;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 1.5mm;
   }}
+
+  /* Tabella */
   table {{
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
   }}
   th, td {{
-    border: 1px solid #333;
-    padding: 2px 1px;
+    border: 0.4pt solid #444;
+    padding: 0.4mm 0.3mm;
     text-align: center;
     vertical-align: middle;
+    line-height: 1.1;
   }}
-  th {{
-    background-color: #d0e4f7;
-    font-weight: bold;
+  thead th {{
+    background: #cfe2f3;
+    font-size: 5.5pt;
   }}
-  .frigo-header {{
-    width: 8%;
+  .frigo-header {{ width: 7.6%; }}
+  .fn {{ font-size: 5.5pt; font-weight: bold; display: block; }}
+  .fp {{ font-size: 4.5pt; color: #333; display: block; }}
+  .fr {{ font-size: 4.5pt; color: #900; font-weight: bold; display: block; }}
+
+  .col-data   {{ width: 6%; }}
+  .col-ora    {{ width: 4.5%; }}
+  .col-firma  {{ width: 6%; }}
+  .col-note   {{ width: 7%; }}
+
+  tbody tr {{ height: 4.8mm; }}
+  tbody tr:nth-child(even) {{ background: #f7fbff; }}
+
+  td.data   {{ font-size: 6pt; font-weight: bold; }}
+  td.orario {{ font-size: 6pt; }}
+  td.temp   {{ font-size: 6.5pt; font-weight: bold; color: #154360; }}
+  td.vuoto  {{ background: #fafafa; }}
+  td.firma  {{ background: #fffde7; }}
+  td.note   {{ background: #fff8f8; font-size: 5pt; }}
+
+  /* Footer note */
+  .footer {{
+    margin-top: 1mm;
+    font-size: 5pt;
+    color: #444;
+    border-top: 0.4pt solid #999;
+    padding-top: 0.8mm;
+    line-height: 1.4;
   }}
-  .frigo-nome {{ font-size: 6.5pt; font-weight: bold; }}
-  .frigo-pos  {{ font-size: 5.5pt; color: #333; }}
-  .frigo-rif  {{ font-size: 5.5pt; color: #c00; font-weight: bold; }}
-  .col-data   {{ width: 7%; }}
-  .col-orario {{ width: 5%; }}
-  .col-firma  {{ width: 7%; }}
-  .col-note   {{ width: 9%; }}
-  td.data     {{ font-size: 7pt; font-weight: bold; }}
-  td.orario   {{ font-size: 7pt; }}
-  td.temp     {{ font-size: 7.5pt; font-weight: bold; color: #1a5276; }}
-  td.future   {{ background: #f9f9f9; }}
-  td.firma    {{ background: #fffde7; }}
-  td.note     {{ background: #fff8f8; font-size: 6pt; text-align: left; padding: 1px 2px; }}
-  .note-footer {{
-    margin-top: 8px;
-    font-size: 6.5pt;
-    color: #333;
-    border-top: 1px solid #999;
-    padding-top: 4px;
+
+  /* Bottone stampa (solo schermo) */
+  @media screen {{
+    .btn-wrap {{ text-align: center; padding: 6px; }}
+    .btn-stampa {{
+      padding: 7px 20px;
+      background: #154360;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10pt;
+    }}
   }}
   @media print {{
-    body {{ font-size: 7pt; }}
-    .no-print {{ display: none; }}
-    table {{ page-break-inside: avoid; }}
-    tr {{ page-break-inside: avoid; }}
-  }}
-  .btn-stampa {{
-    display: inline-block;
-    margin: 10px 0;
-    padding: 8px 20px;
-    background: #1a5276;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 10pt;
+    .btn-wrap {{ display: none; }}
+    body {{ font-size: 6pt; }}
   }}
 </style>
 </head>
 <body>
 
-<div class="no-print" style="text-align:center; padding: 8px;">
+<div class="btn-wrap">
   <button class="btn-stampa" onclick="window.print()">🖨️ Stampa / Salva PDF</button>
 </div>
 
-<div class="header-azienda">
-  <div class="nome">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan"</div>
-  <div class="sottotitolo">Piano Autocontrollo Igienico Sanitario</div>
+<div class="hdr">
+  <span class="hdr-mod">Mod. 10</span>
+  <div class="hdr-centro">
+    <div class="hdr-nome">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan"</div>
+    <div class="hdr-sub">Piano Autocontrollo Igienico Sanitario</div>
+  </div>
+  <span class="hdr-mod">&nbsp;</span>
 </div>
 
-<div class="doc-info">
-  <span class="mod">Mod. 10</span>
-  <span></span>
-</div>
-
-<div class="titolo-tabella">Registrazione Settimanale Temperature</div>
+<div class="titolo">Registrazione Giornaliera Temperature</div>
 <div class="mese-anno">{nome_mese} {anno}</div>
 
 <table>
-  <colgroup>
-    <col class="col-data">
-    <col class="col-orario">
-    {"".join('<col class="col-frigo">' for _ in FRIGHI)}
-    <col class="col-firma">
-    <col class="col-note">
-  </colgroup>
   <thead>
     <tr>
-      <th rowspan="2" class="col-data">DATA</th>
-      <th rowspan="2" class="col-orario">ORA</th>
+      <th class="col-data">DATA</th>
+      <th class="col-ora">ORA</th>
       {intestazioni}
-      <th rowspan="2" class="col-firma">FIRMA</th>
-      <th rowspan="2" class="col-note">Note in caso di<br>superamento valori limite (*)</th>
+      <th class="col-firma">FIRMA</th>
+      <th class="col-note">Note superamento<br>valori limite (*)</th>
     </tr>
-    <tr><!-- seconda riga header già occupata da rowspan --></tr>
   </thead>
   <tbody>
     {righe_html}
   </tbody>
 </table>
 
-<div class="note-footer">
-  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi<br>
-  NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). In tal caso si verificherà la qualità delle materie prime e si procederà ad apposita taratura.<br>
-  <br>
-  Servizio e controllo HACCP realizzato in collaborazione con: <strong>TS SICUREZZA S.r.l. - Trento</strong>
+<div class="footer">
+  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi &nbsp;|&nbsp;
+  NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). &nbsp;|&nbsp;
+  Servizio e controllo HACCP: <strong>TS SICUREZZA S.r.l. - Trento</strong>
 </div>
 
 </body>
@@ -296,18 +289,15 @@ def main(data_target: date = None):
     if data_target is None:
         data_target = date.today()
 
-    anno  = data_target.year
-    mese  = data_target.month
+    anno = data_target.year
+    mese = data_target.month
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Carica dati esistenti e aggiunge il giorno odierno
     dati = carica_dati()
     dati = aggiungi_giorno(dati, data_target)
     salva_dati(dati)
 
-    # Filtra solo i dati del mese corrente (per chiarezza nell'HTML)
-    # ma passa tutti i dati: la funzione HTML accede solo al mese/anno richiesto
     html = genera_html(anno, mese, dati)
 
     nome_file = f"temperature_{anno}_{mese:02d}.html"
@@ -321,7 +311,6 @@ def main(data_target: date = None):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        # es: python generate_temperature.py 2026-05-25
         d = date.fromisoformat(sys.argv[1])
         main(d)
     else:
