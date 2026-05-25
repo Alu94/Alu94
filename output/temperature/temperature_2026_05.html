@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrazione Temperature - Maggio 2026</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 10mm 8mm;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #000;
+    background: #fff;
+  }
+  .header-azienda {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .header-azienda .nome {
+    font-size: 11pt;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .header-azienda .sottotitolo {
+    font-size: 8pt;
+    font-style: italic;
+  }
+  .doc-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4px;
+  }
+  .doc-info .mod { font-size: 7pt; color: #555; }
+  .titolo-tabella {
+    font-size: 12pt;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    border: 2px solid #000;
+    padding: 4px;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .mese-anno {
+    text-align: center;
+    font-size: 9pt;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  th, td {
+    border: 1px solid #333;
+    padding: 2px 1px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #d0e4f7;
+    font-weight: bold;
+  }
+  .frigo-header {
+    width: 8%;
+  }
+  .frigo-nome { font-size: 6.5pt; font-weight: bold; }
+  .frigo-pos  { font-size: 5.5pt; color: #333; }
+  .frigo-rif  { font-size: 5.5pt; color: #c00; font-weight: bold; }
+  .col-data   { width: 7%; }
+  .col-orario { width: 5%; }
+  .col-firma  { width: 7%; }
+  .col-note   { width: 9%; }
+  td.data     { font-size: 7pt; font-weight: bold; }
+  td.orario   { font-size: 7pt; }
+  td.temp     { font-size: 7.5pt; font-weight: bold; color: #1a5276; }
+  td.future   { background: #f9f9f9; }
+  td.firma    { background: #fffde7; }
+  td.note     { background: #fff8f8; font-size: 6pt; text-align: left; padding: 1px 2px; }
+  .note-footer {
+    margin-top: 8px;
+    font-size: 6.5pt;
+    color: #333;
+    border-top: 1px solid #999;
+    padding-top: 4px;
+  }
+  @media print {
+    body { font-size: 7pt; }
+    .no-print { display: none; }
+    table { page-break-inside: avoid; }
+    tr { page-break-inside: avoid; }
+  }
+  .btn-stampa {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 8px 20px;
+    background: #1a5276;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print" style="text-align:center; padding: 8px;">
+  <button class="btn-stampa" onclick="window.print()">🖨️ Stampa / Salva PDF</button>
+</div>
+
+<div class="header-azienda">
+  <div class="nome">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan"</div>
+  <div class="sottotitolo">Piano Autocontrollo Igienico Sanitario</div>
+</div>
+
+<div class="doc-info">
+  <span class="mod">Mod. 10</span>
+  <span></span>
+</div>
+
+<div class="titolo-tabella">Registrazione Settimanale Temperature</div>
+<div class="mese-anno">Maggio 2026</div>
+
+<table>
+  <colgroup>
+    <col class="col-data">
+    <col class="col-orario">
+    <col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo"><col class="col-frigo">
+    <col class="col-firma">
+    <col class="col-note">
+  </colgroup>
+  <thead>
+    <tr>
+      <th rowspan="2" class="col-data">DATA</th>
+      <th rowspan="2" class="col-orario">ORA</th>
+      
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo n°1</div>
+                <div class="frigo-pos">Bar</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo n°2</div>
+                <div class="frigo-pos">Vetrina Sala/Bar</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo n°3</div>
+                <div class="frigo-pos">Vetrina Servizio</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Freezer n°4</div>
+                <div class="frigo-pos">Cucina</div>
+                <div class="frigo-rif">Temp rif. -16/-18°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo Grande n°5</div>
+                <div class="frigo-pos">Cucina</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo Piccolo n°6</div>
+                <div class="frigo-pos">Cucina</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Freezer n°7</div>
+                <div class="frigo-pos">Magazzino</div>
+                <div class="frigo-rif">Temp rif. -16/-18°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Freezer n°8</div>
+                <div class="frigo-pos">Magazzino</div>
+                <div class="frigo-rif">Temp rif. -16/-18°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Freezer n°9</div>
+                <div class="frigo-pos">Magazzino</div>
+                <div class="frigo-rif">Temp rif. -16/-18°C</div>
+            </th>
+            <th class="frigo-header">
+                <div class="frigo-nome">Frigo n°10</div>
+                <div class="frigo-pos">Magazzino</div>
+                <div class="frigo-rif">Temp rif. +4/6°C</div>
+            </th>
+      <th rowspan="2" class="col-firma">FIRMA</th>
+      <th rowspan="2" class="col-note">Note in caso di<br>superamento valori limite (*)</th>
+    </tr>
+    <tr><!-- seconda riga header già occupata da rowspan --></tr>
+  </thead>
+  <tbody>
+    
+        <tr>
+            <td class="data">01/05/2026</td>
+            <td class="orario">08:56</td>
+            <td class="temp">+5.3</td><td class="temp">+5.3</td><td class="temp">+5.6</td><td class="temp">-16.6</td><td class="temp">+4.2</td><td class="temp">+4.3</td><td class="temp">-18.0</td><td class="temp">-18.0</td><td class="temp">-16.2</td><td class="temp">+5.5</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">02/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">03/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">04/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">05/05/2026</td>
+            <td class="orario">09:19</td>
+            <td class="temp">+4.0</td><td class="temp">+5.9</td><td class="temp">+4.4</td><td class="temp">-16.2</td><td class="temp">+4.1</td><td class="temp">+5.6</td><td class="temp">-16.5</td><td class="temp">-16.1</td><td class="temp">-16.7</td><td class="temp">+6.0</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">06/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">07/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">08/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">09/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">10/05/2026</td>
+            <td class="orario">10:28</td>
+            <td class="temp">+5.5</td><td class="temp">+5.3</td><td class="temp">+4.7</td><td class="temp">-16.3</td><td class="temp">+4.1</td><td class="temp">+4.8</td><td class="temp">-16.4</td><td class="temp">-17.2</td><td class="temp">-16.3</td><td class="temp">+6.0</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">11/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">12/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">13/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">14/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">15/05/2026</td>
+            <td class="orario">09:12</td>
+            <td class="temp">+5.3</td><td class="temp">+5.7</td><td class="temp">+4.1</td><td class="temp">-17.8</td><td class="temp">+4.8</td><td class="temp">+4.7</td><td class="temp">-17.1</td><td class="temp">-17.4</td><td class="temp">-16.3</td><td class="temp">+5.7</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">16/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">17/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">18/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">19/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">20/05/2026</td>
+            <td class="orario">09:57</td>
+            <td class="temp">+5.2</td><td class="temp">+5.9</td><td class="temp">+4.2</td><td class="temp">-16.8</td><td class="temp">+5.3</td><td class="temp">+5.2</td><td class="temp">-17.1</td><td class="temp">-16.8</td><td class="temp">-17.6</td><td class="temp">+5.3</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">21/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">22/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">23/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">24/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">25/05/2026</td>
+            <td class="orario">09:12</td>
+            <td class="temp">+5.1</td><td class="temp">+4.5</td><td class="temp">+5.9</td><td class="temp">-16.6</td><td class="temp">+4.8</td><td class="temp">+4.6</td><td class="temp">-17.4</td><td class="temp">-17.9</td><td class="temp">-17.8</td><td class="temp">+5.4</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">26/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">27/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">28/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">29/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">30/05/2026</td>
+            <td class="orario">08:17</td>
+            <td class="temp">+5.1</td><td class="temp">+5.9</td><td class="temp">+4.9</td><td class="temp">-17.0</td><td class="temp">+4.9</td><td class="temp">+5.3</td><td class="temp">-16.2</td><td class="temp">-17.8</td><td class="temp">-16.2</td><td class="temp">+5.7</td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+        <tr>
+            <td class="data">31/05/2026</td>
+            <td class="orario"></td>
+            <td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td><td class="temp future"></td>
+            <td class="firma"></td>
+            <td class="note"></td>
+        </tr>
+  </tbody>
+</table>
+
+<div class="note-footer">
+  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi<br>
+  NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). In tal caso si verificherà la qualità delle materie prime e si procederà ad apposita taratura.<br>
+  <br>
+  Servizio e controllo HACCP realizzato in collaborazione con: <strong>TS SICUREZZA S.r.l. - Trento</strong>
+</div>
+
+</body>
+</html>
