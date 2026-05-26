@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/"
+  to   = "/temperature_dipendenti.html"
+  status = 302
