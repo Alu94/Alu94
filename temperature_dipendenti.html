@@ -6,503 +6,547 @@
 <title>🌡️ Temperature Frighi — Holiday in Gardan</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: Arial, sans-serif;
-    background: #f0f4f8;
-    color: #222;
-    min-height: 100vh;
-  }
+  body { font-family: Arial, sans-serif; background: #f0f4f8; color: #222; min-height: 100vh; }
 
   /* ── HEADER ── */
   .top-bar {
-    background: #1a3a5c;
-    color: white;
+    background: #1a3a5c; color: white;
     padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
   }
-  .top-bar h1 { font-size: 15pt; }
-  .top-bar .sub { font-size: 9pt; opacity: .8; }
+  .top-bar-title { font-size: 14pt; font-weight: bold; }
+  .top-bar-sub   { font-size: 8.5pt; opacity: .8; margin-top: 2px; }
 
   /* ── BARRA MESE ── */
   .mese-bar {
-    background: #e8f0fb;
-    border-bottom: 2px solid #c0d0e8;
+    background: #e8f0fb; border-bottom: 2px solid #c0d0e8;
     padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
   .nav-btn {
-    background: #1a3a5c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 16pt;
-    cursor: pointer;
-    line-height: 1;
+    background: #1a3a5c; color: white; border: none; border-radius: 6px;
+    padding: 8px 18px; font-size: 16pt; cursor: pointer; line-height: 1;
   }
   .nav-btn:hover { background: #255a8f; }
-  .mese-label {
-    font-size: 15pt;
-    font-weight: bold;
-    min-width: 180px;
-    text-align: center;
-  }
+  .mese-label { font-size: 14pt; font-weight: bold; min-width: 180px; text-align: center; }
+
   .btn {
-    padding: 9px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 11pt;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    padding: 8px 18px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 10.5pt; font-weight: bold;
+    display: inline-flex; align-items: center; gap: 6px;
   }
-  .btn-stampa  { background: #1a3a5c; color: white; }
+  .btn-stampa   { background: #1a3a5c; color: white; }
+  .btn-impost   { background: #7f8c8d; color: white; }
   .btn-stampa:hover { background: #255a8f; }
+  .btn-impost:hover { background: #626d6d; }
+
+  /* ── SPINNER / STATO ── */
+  #stato-bar {
+    background: #eaf4fb; border-bottom: 1px solid #b8d4e8;
+    padding: 5px 16px; font-size: 9pt; color: #1a3a5c;
+    display: flex; align-items: center; gap: 8px; min-height: 30px;
+  }
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid #aac; border-top-color: #1a3a5c;
+    border-radius: 50%; animation: spin .7s linear infinite; display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── TOAST ── */
   #toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #27ae60;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 11pt;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity .3s;
-    z-index: 9999;
-    pointer-events: none;
+    position: fixed; bottom: 20px; right: 20px;
+    padding: 10px 20px; border-radius: 8px; font-size: 11pt; font-weight: bold;
+    opacity: 0; transition: opacity .3s; z-index: 9999; pointer-events: none;
+    background: #27ae60; color: white;
   }
   #toast.show { opacity: 1; }
+  #toast.errore { background: #e74c3c; }
+
+  /* ── MODAL SETUP ── */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal {
+    background: white; border-radius: 10px; padding: 28px 32px;
+    max-width: 480px; width: 94%; box-shadow: 0 8px 32px rgba(0,0,0,.2);
+  }
+  .modal h2 { font-size: 14pt; margin-bottom: 10px; color: #1a3a5c; }
+  .modal p  { font-size: 9.5pt; color: #555; margin-bottom: 14px; line-height: 1.5; }
+  .modal input {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #bbb; border-radius: 6px;
+    font-size: 10pt; margin-bottom: 14px; font-family: monospace;
+  }
+  .modal input:focus { outline: none; border-color: #1a3a5c; }
+  .btn-ok { background: #1a3a5c; color: white; width: 100%; padding: 10px; font-size: 11pt; border: none; border-radius: 6px; cursor: pointer; }
+  .btn-ok:hover { background: #255a8f; }
+  .errore-msg { color: #e74c3c; font-size: 9pt; margin-top: -8px; margin-bottom: 10px; display: none; }
 
   /* ── TABELLA ── */
-  .wrap { overflow-x: auto; padding: 12px; }
-
+  .wrap { overflow-x: auto; padding: 10px; }
   table {
-    border-collapse: collapse;
-    min-width: 900px;
-    width: 100%;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
+    border-collapse: collapse; min-width: 900px; width: 100%;
+    background: white; border-radius: 8px; overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,.12);
   }
   thead th {
-    background: #1a3a5c;
-    color: white;
-    padding: 8px 4px;
-    font-size: 8pt;
-    text-align: center;
-    border: 1px solid #255a8f;
-    vertical-align: middle;
+    background: #1a3a5c; color: white; padding: 7px 3px;
+    font-size: 7.5pt; text-align: center; border: 1px solid #255a8f; vertical-align: middle;
   }
   thead th .fn { font-size: 7.5pt; font-weight: bold; display: block; }
-  thead th .fp { font-size: 6.5pt; opacity: .8; display: block; }
-  thead th .fr { font-size: 7pt; color: #ffd; font-weight: bold; display: block; }
+  thead th .fp { font-size: 6pt; opacity: .8; display: block; }
+  thead th .fr { font-size: 6.5pt; color: #ffd; font-weight: bold; display: block; }
 
   tbody tr { border-bottom: 1px solid #dde; }
   tbody tr:hover { background: #f5f8ff !important; }
-
-  /* oggi evidenziato */
-  tbody tr.oggi { background: #e8f5e9 !important; }
-  tbody tr.oggi td.data-col { font-weight: bold; color: #1a5c2a; }
-
-  /* righe future */
-  tbody tr.futura { background: #fafafa; color: #aaa; }
+  tbody tr.oggi   { background: #e8f5e9 !important; }
+  tbody tr.futura { background: #fafafa; color: #bbb; }
 
   td {
-    padding: 5px 4px;
-    text-align: center;
-    font-size: 9pt;
-    border: 1px solid #e0e4ea;
-    vertical-align: middle;
+    padding: 4px 3px; text-align: center; font-size: 9pt;
+    border: 1px solid #e0e4ea; vertical-align: middle;
   }
-  td.data-col {
-    font-weight: bold;
-    font-size: 8.5pt;
-    background: #f7f9fc;
-    white-space: nowrap;
-    min-width: 72px;
-  }
-  td.ora-col { min-width: 52px; }
+  td.data-col  { font-weight: bold; font-size: 8pt; background: #f7f9fc; white-space: nowrap; min-width: 80px; }
+  td.ora-col   { min-width: 50px; }
   td.firma-col { background: #fffde7; min-width: 80px; }
-  td.note-col { background: #fff8f8; min-width: 90px; text-align: left; font-size: 8pt; }
+  td.note-col  { background: #fff8f8; min-width: 90px; text-align: left; font-size: 8pt; }
 
-  /* celle editabili */
-  td.editabile {
-    cursor: pointer;
-    transition: background .15s;
-  }
-  td.editabile:hover { background: #e8f0ff !important; }
+  td.editabile { cursor: pointer; }
+  td.editabile:hover:not([contenteditable="false"]) { background: #e8f0ff !important; }
   td.editabile:focus {
-    outline: 2.5px solid #e67e22;
-    background: #fff9e6 !important;
-    border-radius: 2px;
+    outline: 2.5px solid #e67e22; background: #fff9e6 !important; border-radius: 2px;
   }
-
   td.temp-frigo   { color: #1a5276; font-weight: bold; }
   td.temp-freezer { color: #6c3483; font-weight: bold; }
-  td.modificato   { background: #fffde7 !important; }
+  td.salvando     { opacity: .5; }
+  td.salvato      { background: #eafbea !important; transition: background 1s; }
 
-  /* ── LEGENDA ── */
   .legenda {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 8px 16px 4px;
-    font-size: 8.5pt;
-    align-items: center;
+    display: flex; gap: 14px; flex-wrap: wrap;
+    padding: 6px 16px 2px; font-size: 8pt; align-items: center; color: #555;
   }
-  .dot {
-    display: inline-block;
-    width: 12px; height: 12px;
-    border-radius: 3px;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
+  .dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 3px; vertical-align: middle; }
 
   /* ── PRINT ── */
   @page { size: A4 landscape; margin: 6mm 5mm; }
   @media print {
-    body { background: white; }
-    .top-bar { background: #1a3a5c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .mese-bar { display: none; }
-    .legenda  { display: none; }
-    .no-print { display: none !important; }
-    thead th  { background: #1a3a5c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    tbody tr.oggi { background: #e8f5e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .top-bar  { background: #1a3a5c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; }
+    .top-bar-title { font-size: 10pt; }
+    .mese-bar, .legenda, #stato-bar, .no-print { display: none !important; }
     .wrap { padding: 0; overflow: visible; }
-    table { box-shadow: none; border-radius: 0; font-size: 7pt; }
-    td { padding: 2px 2px; font-size: 7pt; }
-    thead th { font-size: 6.5pt; padding: 3px 2px; }
+    table { box-shadow: none; border-radius: 0; }
+    td, thead th { padding: 2px 2px; font-size: 6.5pt; }
+    thead th { background: #1a3a5c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tbody tr.oggi { background: #e8f5e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     td.editabile:focus { outline: none; background: inherit !important; }
+    .titolo-stampa { display: block !important; text-align: center; font-size: 10pt; font-weight: bold; text-transform: uppercase; border: 1.5px solid #000; padding: 2px; margin: 2px 0 4px; }
   }
+  .titolo-stampa { display: none; }
 </style>
 </head>
 <body>
 
-<div id="toast">✅ Salvato!</div>
-
-<!-- HEADER -->
-<div class="top-bar no-print">
-  <div>
-    <div class="h1" style="font-size:15pt;font-weight:bold;">🌡️ Registro Temperature Frighi</div>
-    <div class="sub">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan" — Piano HACCP Mod. 10</div>
+<!-- MODAL SETUP TOKEN -->
+<div class="overlay" id="modalSetup" style="display:none;">
+  <div class="modal">
+    <h2>🔑 Configurazione iniziale</h2>
+    <p>
+      Inserisci il <strong>Token di accesso GitHub</strong> fornito dall'amministratore.<br>
+      Questa operazione va fatta <strong>una sola volta</strong> su questo browser.
+    </p>
+    <input type="password" id="inputToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    <div class="errore-msg" id="errToken">❌ Token non valido o errato. Riprova.</div>
+    <button class="btn-ok" onclick="salvaToken()">✅ Conferma e accedi</button>
   </div>
-  <button class="btn btn-stampa" onclick="window.print()">🖨️ Stampa / Salva PDF</button>
 </div>
 
-<!-- BARRA NAVIGAZIONE MESE -->
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- HEADER -->
+<div class="top-bar">
+  <div>
+    <div class="top-bar-title">🌡️ Registro Temperature Frighi</div>
+    <div class="top-bar-sub">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan" — HACCP Mod. 10</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;" class="no-print">
+    <button class="btn btn-stampa" onclick="window.print()">🖨️ Stampa</button>
+    <button class="btn btn-impost" onclick="mostraImpostazioni()">⚙️ Impostazioni</button>
+  </div>
+</div>
+
+<!-- BARRA MESE -->
 <div class="mese-bar no-print">
   <button class="nav-btn" onclick="cambiaMese(-1)">‹</button>
   <div class="mese-label" id="labelMese">—</div>
   <button class="nav-btn" onclick="cambiaMese(+1)">›</button>
-  <span style="font-size:9pt;color:#666;margin-left:8px;">
-    💡 Clicca su qualsiasi temperatura o orario per modificarlo — si salva automaticamente
+  <span style="font-size:8.5pt;color:#666;margin-left:6px;">
+    💡 Clicca su temperatura o orario per correggere — si salva automaticamente su GitHub
   </span>
+</div>
+
+<!-- STATO / SPINNER -->
+<div id="stato-bar" class="no-print">
+  <div class="spinner" id="spinner"></div>
+  <span id="stato-msg">Caricamento dati...</span>
 </div>
 
 <!-- LEGENDA -->
 <div class="legenda no-print">
-  <span><span class="dot" style="background:#e8f5e9;border:1px solid #a5d6a7;"></span> Oggi</span>
-  <span><span class="dot" style="background:#fffde7;border:1px solid #ffe082;"></span> Modificato manualmente</span>
-  <span><span class="dot" style="background:#fafafa;border:1px solid #ddd;"></span> Giorno futuro</span>
-  <span style="margin-left:auto;font-size:8pt;color:#888;">I dati si salvano nel browser di questo PC</span>
+  <span><span class="dot" style="background:#e8f5e9;border:1px solid #a5d6a7;"></span>Oggi</span>
+  <span><span class="dot" style="background:#1a5276;"></span><span style="color:#1a5276;">Frigo (+4/6°C)</span></span>
+  <span><span class="dot" style="background:#6c3483;"></span><span style="color:#6c3483;">Freezer (-16/-18°C)</span></span>
+  <span><span class="dot" style="background:#fffde7;border:1px solid #ffe082;"></span>Firma</span>
+  <span style="margin-left:auto;font-size:7.5pt;color:#888;">Dati salvati su GitHub • aggiornamento automatico ore 07:00</span>
 </div>
 
-<!-- TITOLO STAMPA (solo in stampa) -->
-<div style="display:none;" id="titolo-stampa">
-  <div style="text-align:center;font-size:11pt;font-weight:bold;text-transform:uppercase;border:1.5px solid #000;padding:3px;margin:2px 0 4px;">
-    Registrazione Giornaliera Temperature — <span id="mese-stampa"></span>
-  </div>
+<!-- TITOLO STAMPA -->
+<div class="titolo-stampa" id="titolo-stampa">
+  Registrazione Giornaliera Temperature — <span id="mese-stampa"></span>
 </div>
 
 <!-- TABELLA -->
 <div class="wrap">
-<table id="tabella">
-  <thead>
-    <tr id="thead-row">
-      <th style="width:72px;">DATA</th>
-      <th style="width:52px;">ORA</th>
-      <!-- frighi inseriti via JS -->
-      <th style="width:80px;" class="firma-col">FIRMA</th>
-      <th style="width:110px;">Note</th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
+  <table id="tabella">
+    <thead>
+      <tr id="thead-row">
+        <th style="width:82px;">DATA</th>
+        <th style="width:50px;">ORA</th>
+        <th style="width:80px;" class="firma-col">FIRMA</th>
+        <th style="width:100px;">Note (*)</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      <tr><td colspan="14" style="padding:30px;color:#999;font-size:10pt;">⏳ Caricamento dati in corso...</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<div style="padding:8px 16px;font-size:7pt;color:#888;border-top:1px solid #ddd;margin-top:4px;">
+<div style="padding:6px 16px;font-size:6.5pt;color:#999;border-top:1px solid #ddd;margin-top:2px;">
   (*) Istruzione al personale / riparazione / sostituzione / regolazione refrigeratore / smaltimento cibi &nbsp;|&nbsp;
-  Rialzi termici incidentali max +3°C — verificare qualità materie prime &nbsp;|&nbsp;
-  HACCP: TS SICUREZZA S.r.l. - Trento
+  Rialzi termici incidentali max +3°C — verificare qualità materie prime &nbsp;|&nbsp; HACCP: TS SICUREZZA S.r.l. - Trento
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  CONFIGURAZIONE FRIGHI
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+var REPO      = 'Alu94/haccp-holiday-gardan';
+var DATA_PATH = 'output/temperature/data.json';
+var API       = 'https://api.github.com/repos/' + REPO + '/contents/' + DATA_PATH;
+
 var FRIGHI = [
-  { n:1,  nome:"Frigo n°1",        pos:"Bar",              tipo:"frigo",   rif:"+4/6°C"    },
-  { n:2,  nome:"Frigo n°2",        pos:"Vetrina Sala/Bar", tipo:"frigo",   rif:"+4/6°C"    },
-  { n:3,  nome:"Frigo n°3",        pos:"Vetrina Servizio", tipo:"frigo",   rif:"+4/6°C"    },
-  { n:4,  nome:"Freezer n°4",      pos:"Cucina",           tipo:"freezer", rif:"-16/-18°C" },
-  { n:5,  nome:"Frigo Grande n°5", pos:"Cucina",           tipo:"frigo",   rif:"+4/6°C"    },
-  { n:6,  nome:"Frigo Piccolo n°6",pos:"Cucina",           tipo:"frigo",   rif:"+4/6°C"    },
-  { n:7,  nome:"Freezer n°7",      pos:"Magazzino",        tipo:"freezer", rif:"-16/-18°C" },
-  { n:8,  nome:"Freezer n°8",      pos:"Magazzino",        tipo:"freezer", rif:"-16/-18°C" },
-  { n:9,  nome:"Freezer n°9",      pos:"Magazzino",        tipo:"freezer", rif:"-16/-18°C" },
-  { n:10, nome:"Frigo n°10",       pos:"Magazzino",        tipo:"frigo",   rif:"+4/6°C"    }
+  { n:1,  nome:'Frigo n°1',         pos:'Bar',              tipo:'frigo',   rif:'+4/6°C'    },
+  { n:2,  nome:'Frigo n°2',         pos:'Vetrina Sala/Bar', tipo:'frigo',   rif:'+4/6°C'    },
+  { n:3,  nome:'Frigo n°3',         pos:'Vetrina Servizio', tipo:'frigo',   rif:'+4/6°C'    },
+  { n:4,  nome:'Freezer n°4',       pos:'Cucina',           tipo:'freezer', rif:'-16/-18°C' },
+  { n:5,  nome:'Frigo Grande n°5',  pos:'Cucina',           tipo:'frigo',   rif:'+4/6°C'    },
+  { n:6,  nome:'Frigo Piccolo n°6', pos:'Cucina',           tipo:'frigo',   rif:'+4/6°C'    },
+  { n:7,  nome:'Freezer n°7',       pos:'Magazzino',        tipo:'freezer', rif:'-16/-18°C' },
+  { n:8,  nome:'Freezer n°8',       pos:'Magazzino',        tipo:'freezer', rif:'-16/-18°C' },
+  { n:9,  nome:'Freezer n°9',       pos:'Magazzino',        tipo:'freezer', rif:'-16/-18°C' },
+  { n:10, nome:'Frigo n°10',        pos:'Magazzino',        tipo:'frigo',   rif:'+4/6°C'    }
 ];
 
-var MESI = ["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
-            "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+var MESI = ['','Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+            'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
-// Mese corrente visualizzato
-var oggi     = new Date();
-var annoVis  = oggi.getFullYear();
-var meseVis  = oggi.getMonth() + 1;   // 1-12
+var oggi    = new Date();
+var annoVis = oggi.getFullYear();
+var meseVis = oggi.getMonth() + 1;
+var datiGlobali = {};
+var shaGlobale  = null;
+var statoTimer  = null;
+var toastTimer  = null;
 
-// ═══════════════════════════════════════════════════
-//  STORAGE — localStorage per mese
-// ═══════════════════════════════════════════════════
-function chiaveMese(a, m) { return "haccp_temp_" + a + "_" + pad(m); }
-function pad(n) { return n < 10 ? "0" + n : "" + n; }
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function pad(n) { return n < 10 ? '0'+n : ''+n; }
+function isoDate(a,m,g) { return a+'-'+pad(m)+'-'+pad(g); }
+function getToken() { return localStorage.getItem('haccp_token') || ''; }
 
-function caricaDatiMese(a, m) {
-  var raw = localStorage.getItem(chiaveMese(a, m));
-  return raw ? JSON.parse(raw) : {};
+function stato(msg, loading) {
+  document.getElementById('stato-msg').textContent = msg;
+  document.getElementById('spinner').style.display = loading ? 'block' : 'none';
 }
-function salvaDatiMese(a, m, dati) {
-  localStorage.setItem(chiaveMese(a, m), JSON.stringify(dati));
-}
-
-// ═══════════════════════════════════════════════════
-//  GENERAZIONE AUTOMATICA TEMPERATURE
-// ═══════════════════════════════════════════════════
-function rnd(min, max, dec) {
-  var v = Math.random() * (max - min) + min;
-  return parseFloat(v.toFixed(dec !== undefined ? dec : 1));
-}
-function randTemp(tipo) {
-  if (tipo === "frigo")   return "+" + rnd(4.0, 6.0);
-  else                    return "-" + rnd(16.0, 18.0);
-}
-function randOrario() {
-  var minTot = Math.floor(Math.random() * (150)) + 480; // 480=08:00, 630=10:30
-  return pad(Math.floor(minTot/60)) + ":" + pad(minTot % 60);
+function toast(msg, err) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (err ? ' errore' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.className = ''; }, 2200);
 }
 
-function isoDate(a, m, g) {
-  return a + "-" + pad(m) + "-" + pad(g);
+// ═══════════════════════════════════════════════════════
+//  TOKEN / SETUP
+// ═══════════════════════════════════════════════════════
+function mostraSetup() {
+  document.getElementById('modalSetup').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('inputToken').focus(); }, 100);
+}
+function mostraImpostazioni() {
+  document.getElementById('errToken').style.display = 'none';
+  document.getElementById('inputToken').value = '';
+  mostraSetup();
 }
 
-// Compila automaticamente tutti i giorni passati (e oggi) se non già presenti
-function autoCompila(a, m, dati) {
-  var oggi2 = new Date(); oggi2.setHours(0,0,0,0);
-  var nGiorni = new Date(a, m, 0).getDate();
-  var modificato = false;
-  for (var g = 1; g <= nGiorni; g++) {
-    var d = new Date(a, m-1, g); d.setHours(0,0,0,0);
-    if (d > oggi2) break;   // non compilare giorni futuri
-    var k = isoDate(a, m, g);
-    if (!dati[k]) {
-      dati[k] = { orario: randOrario(), temperature: {} };
-      FRIGHI.forEach(function(f) {
-        dati[k].temperature[f.n] = randTemp(f.tipo);
-      });
-      modificato = true;
-    }
+async function salvaToken() {
+  var tok = document.getElementById('inputToken').value.trim();
+  if (!tok) return;
+  stato('Verifica token...', true);
+  // Verifica che il token funzioni
+  try {
+    var r = await fetch(API, { headers: { 'Authorization': 'token '+tok, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!r.ok) throw new Error('Token non valido');
+    localStorage.setItem('haccp_token', tok);
+    document.getElementById('modalSetup').style.display = 'none';
+    document.getElementById('errToken').style.display = 'none';
+    await caricaERender();
+  } catch(e) {
+    stato('', false);
+    document.getElementById('errToken').style.display = 'block';
   }
-  if (modificato) salvaDatiMese(a, m, dati);
-  return dati;
 }
 
-// ═══════════════════════════════════════════════════
-//  COSTRUZIONE INTESTAZIONI
-// ═══════════════════════════════════════════════════
+// Invio con Enter nel campo token
+document.getElementById('inputToken').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') salvaToken();
+});
+
+// ═══════════════════════════════════════════════════════
+//  GITHUB API — LEGGI
+// ═══════════════════════════════════════════════════════
+async function caricaDatiGitHub() {
+  var r = await fetch(API + '?t=' + Date.now(), {
+    headers: { 'Authorization': 'token ' + getToken(), 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error('Errore HTTP ' + r.status);
+  var json = await r.json();
+  shaGlobale  = json.sha;
+  var content = json.content.replace(/\n/g, '');
+  // Decodifica base64 con supporto UTF-8
+  var binary  = atob(content);
+  var bytes   = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  var text = new TextDecoder('utf-8').decode(bytes);
+  return JSON.parse(text);
+}
+
+// ═══════════════════════════════════════════════════════
+//  GITHUB API — SCRIVI
+// ═══════════════════════════════════════════════════════
+async function salvaDatiGitHub(nuoviDati) {
+  // Rilegge SHA aggiornato prima di scrivere (evita conflitti)
+  var rCheck = await fetch(API + '?t=' + Date.now(), {
+    headers: { 'Authorization': 'token ' + getToken(), 'Accept': 'application/vnd.github.v3+json' }
+  });
+  var jCheck  = await rCheck.json();
+  shaGlobale  = jCheck.sha;
+
+  var json    = JSON.stringify(nuoviDati, null, 2);
+  var encoded = btoa(unescape(encodeURIComponent(json)));
+  var dataOggi = pad(oggi.getDate())+'/'+pad(oggi.getMonth()+1)+'/'+oggi.getFullYear();
+
+  var r = await fetch(API, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + getToken(),
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: '✏️ Correzione manuale ' + dataOggi,
+      content: encoded,
+      sha: shaGlobale
+    })
+  });
+  if (!r.ok) throw new Error('Errore salvataggio ' + r.status);
+  var jRes = await r.json();
+  shaGlobale = jRes.content.sha;
+}
+
+// ═══════════════════════════════════════════════════════
+//  INTESTAZIONI TABELLA
+// ═══════════════════════════════════════════════════════
 function costruisciIntestazioni() {
-  var tr = document.getElementById("thead-row");
-  // Svuota le celle tra DATA/ORA e FIRMA/NOTE
-  while (tr.children.length > 2) {
-    tr.removeChild(tr.children[2]);
-  }
-  // Inserisce i frighi tra ORA e FIRMA
-  var firma = tr.children[2]; // FIRMA
+  var tr = document.getElementById('thead-row');
+  while (tr.children.length > 2) tr.removeChild(tr.children[2]);
+  var firma = tr.children[2];
   FRIGHI.forEach(function(f) {
-    var th = document.createElement("th");
-    th.style.width = "68px";
-    th.innerHTML = '<span class="fn">' + f.nome + '</span>'
-                 + '<span class="fp">' + f.pos  + '</span>'
-                 + '<span class="fr">' + f.rif  + '</span>';
+    var th = document.createElement('th');
+    th.style.width = '66px';
+    th.innerHTML = '<span class="fn">'+f.nome+'</span><span class="fp">'+f.pos+'</span><span class="fr">'+f.rif+'</span>';
     tr.insertBefore(th, firma);
   });
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  RENDERING TABELLA
-// ═══════════════════════════════════════════════════
-function renderTabella(a, m) {
-  document.getElementById("labelMese").textContent = MESI[m] + " " + a;
-  document.getElementById("mese-stampa").textContent = MESI[m] + " " + a;
+// ═══════════════════════════════════════════════════════
+function renderTabella(a, m, dati) {
+  document.getElementById('labelMese').textContent  = MESI[m] + ' ' + a;
+  document.getElementById('mese-stampa').textContent = MESI[m] + ' ' + a;
 
-  var dati = caricaDatiMese(a, m);
-  dati = autoCompila(a, m, dati);
-
-  var tbody   = document.getElementById("tbody");
-  tbody.innerHTML = "";
-
+  var tbody   = document.getElementById('tbody');
+  tbody.innerHTML = '';
   var oggiStr = isoDate(oggi.getFullYear(), oggi.getMonth()+1, oggi.getDate());
   var nGiorni = new Date(a, m, 0).getDate();
+  var giorni  = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 
   for (var g = 1; g <= nGiorni; g++) {
-    var k   = isoDate(a, m, g);
-    var riga = dati[k];
+    var k     = isoDate(a, m, g);
+    var riga  = dati[k];
     var dData = new Date(a, m-1, g);
     var isOggi   = (k === oggiStr);
     var isFutura = (dData > oggi);
 
-    var tr = document.createElement("tr");
-    if (isOggi)   tr.classList.add("oggi");
-    if (isFutura) tr.classList.add("futura");
+    var tr = document.createElement('tr');
+    if (isOggi)   tr.classList.add('oggi');
+    if (isFutura) tr.classList.add('futura');
 
     // DATA
-    var tdData = document.createElement("td");
-    tdData.className = "data-col";
-    var gg = ["Dom","Lun","Mar","Mer","Gio","Ven","Sab"][dData.getDay()];
-    tdData.textContent = pad(g) + "/" + pad(m) + "/" + a + " " + gg;
-    if (isOggi) tdData.innerHTML += " <span style='font-size:7pt;background:#27ae60;color:white;border-radius:3px;padding:1px 4px;'>OGGI</span>";
+    var tdData = document.createElement('td');
+    tdData.className = 'data-col';
+    var gg = giorni[dData.getDay()];
+    tdData.innerHTML = pad(g)+'/'+pad(m)+'/'+a+' <span style="color:#888;font-weight:normal;">'+gg+'</span>';
+    if (isOggi) tdData.innerHTML += ' <span style="font-size:6.5pt;background:#27ae60;color:white;border-radius:3px;padding:1px 3px;">OGGI</span>';
     tr.appendChild(tdData);
 
     // ORA
-    var tdOra = document.createElement("td");
-    tdOra.className = "ora-col editabile";
-    tdOra.setAttribute("contenteditable", isFutura ? "false" : "true");
-    tdOra.textContent = riga ? riga.orario : "";
+    var tdOra = document.createElement('td');
+    tdOra.className = 'ora-col editabile';
+    tdOra.setAttribute('contenteditable', isFutura ? 'false' : 'true');
+    tdOra.textContent = (riga && riga.orario) ? riga.orario : '';
     tdOra.dataset.key   = k;
-    tdOra.dataset.campo = "orario";
-    if (!isFutura) bindSave(tdOra, a, m);
+    tdOra.dataset.campo = 'orario';
+    if (!isFutura) bindSave(tdOra);
     tr.appendChild(tdOra);
 
     // TEMPERATURE
     FRIGHI.forEach(function(f) {
-      var td = document.createElement("td");
-      td.className = "editabile " + (f.tipo === "frigo" ? "temp-frigo" : "temp-freezer");
-      td.setAttribute("contenteditable", isFutura ? "false" : "true");
-      td.textContent = (riga && riga.temperature) ? (riga.temperature[f.n] || "") : "";
+      var td = document.createElement('td');
+      td.className = 'editabile ' + (f.tipo === 'frigo' ? 'temp-frigo' : 'temp-freezer');
+      td.setAttribute('contenteditable', isFutura ? 'false' : 'true');
+      td.textContent = (riga && riga.temperature) ? (riga.temperature[f.n] || '') : '';
       td.dataset.key   = k;
       td.dataset.frigo = f.n;
-      if (!isFutura) bindSave(td, a, m);
+      if (!isFutura) bindSave(td);
       tr.appendChild(td);
     });
 
     // FIRMA
-    var tdFirma = document.createElement("td");
-    tdFirma.className = "firma-col";
+    var tdFirma = document.createElement('td');
+    tdFirma.className = 'firma-col';
     tr.appendChild(tdFirma);
 
     // NOTE
-    var tdNote = document.createElement("td");
-    tdNote.className = "note-col editabile";
-    tdNote.setAttribute("contenteditable", isFutura ? "false" : "true");
-    tdNote.textContent = (riga && riga.note) ? riga.note : "";
+    var tdNote = document.createElement('td');
+    tdNote.className = 'note-col editabile';
+    tdNote.setAttribute('contenteditable', isFutura ? 'false' : 'true');
+    tdNote.textContent = (riga && riga.note) ? riga.note : '';
     tdNote.dataset.key   = k;
-    tdNote.dataset.campo = "note";
-    if (!isFutura) bindSave(tdNote, a, m);
+    tdNote.dataset.campo = 'note';
+    if (!isFutura) bindSave(tdNote);
     tr.appendChild(tdNote);
 
     tbody.appendChild(tr);
   }
 
-  // Scroll su oggi (se stesso mese)
+  // Scroll su oggi (stesso mese)
   if (a === oggi.getFullYear() && m === oggi.getMonth()+1) {
-    var oggiRow = tbody.querySelector("tr.oggi");
-    if (oggiRow) setTimeout(function(){ oggiRow.scrollIntoView({block:"center", behavior:"smooth"}); }, 100);
+    var oggiRow = tbody.querySelector('tr.oggi');
+    if (oggiRow) setTimeout(function(){ oggiRow.scrollIntoView({block:'center', behavior:'smooth'}); }, 150);
   }
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  SALVATAGGIO AUTOMATICO
-// ═══════════════════════════════════════════════════
-var toastTimer = null;
-function mostraToast(msg) {
-  var t = document.getElementById("toast");
-  t.textContent = msg || "✅ Salvato!";
-  t.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1800);
-}
-
-function bindSave(td, a, m) {
-  td.addEventListener("blur", function() {
-    var k = td.dataset.key;
-    var dati = caricaDatiMese(a, m);
-    if (!dati[k]) dati[k] = { orario: "", temperature: {}, note: "" };
-
-    if (td.dataset.campo === "orario") {
-      dati[k].orario = td.textContent.trim();
-    } else if (td.dataset.campo === "note") {
-      dati[k].note = td.textContent.trim();
-    } else if (td.dataset.frigo) {
-      if (!dati[k].temperature) dati[k].temperature = {};
-      dati[k].temperature[td.dataset.frigo] = td.textContent.trim();
-    }
-    salvaDatiMese(a, m, dati);
-    td.classList.add("modificato");
-    mostraToast("✅ Salvato!");
-  });
-
-  // Seleziona tutto al click
-  td.addEventListener("focus", function() {
+// ═══════════════════════════════════════════════════════
+function bindSave(td) {
+  td.addEventListener('focus', function() {
     var range = document.createRange();
     range.selectNodeContents(td);
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
   });
 
-  // Tab per passare alla cella successiva
-  td.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" || e.key === "Tab") {
-      e.preventDefault();
-      td.blur();
-      // Trova la prossima cella editabile
-      var cells = Array.from(document.querySelectorAll("td.editabile[contenteditable='true']"));
-      var idx   = cells.indexOf(td);
+  td.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault(); td.blur();
+      var cells = Array.from(document.querySelectorAll('td.editabile[contenteditable="true"]'));
+      var idx = cells.indexOf(td);
       if (idx >= 0 && idx < cells.length - 1) cells[idx + 1].focus();
     }
-    if (e.key === "Escape") { td.blur(); }
+    if (e.key === 'Escape') { td.blur(); }
+  });
+
+  td.addEventListener('blur', async function() {
+    var k    = td.dataset.key;
+    var val  = td.textContent.trim();
+
+    // Aggiorna i dati in memoria
+    if (!datiGlobali[k]) datiGlobali[k] = { orario:'', temperature:{}, note:'' };
+    if (td.dataset.campo === 'orario')      datiGlobali[k].orario = val;
+    else if (td.dataset.campo === 'note')   datiGlobali[k].note   = val;
+    else if (td.dataset.frigo)              datiGlobali[k].temperature[td.dataset.frigo] = val;
+
+    // Salva su GitHub
+    td.classList.add('salvando');
+    stato('💾 Salvataggio in corso...', true);
+    try {
+      await salvaDatiGitHub(datiGlobali);
+      td.classList.remove('salvando');
+      td.classList.add('salvato');
+      setTimeout(function(){ td.classList.remove('salvato'); }, 1200);
+      stato('✅ Salvato su GitHub — ' + new Date().toLocaleTimeString('it-IT'), false);
+      toast('✅ Salvato!');
+    } catch(e) {
+      td.classList.remove('salvando');
+      stato('❌ Errore salvataggio: ' + e.message, false);
+      toast('❌ Errore: controlla la connessione', true);
+    }
   });
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  NAVIGAZIONE MESE
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function cambiaMese(delta) {
   meseVis += delta;
   if (meseVis > 12) { meseVis = 1;  annoVis++; }
   if (meseVis < 1)  { meseVis = 12; annoVis--; }
-  renderTabella(annoVis, meseVis);
+  renderTabella(annoVis, meseVis, datiGlobali);
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  AVVIO
-// ═══════════════════════════════════════════════════
-costruisciIntestazioni();
-renderTabella(annoVis, meseVis);
+// ═══════════════════════════════════════════════════════
+async function caricaERender() {
+  stato('📡 Caricamento dati da GitHub...', true);
+  try {
+    datiGlobali = await caricaDatiGitHub();
+    stato('✅ Dati aggiornati alle ' + new Date().toLocaleTimeString('it-IT'), false);
+    renderTabella(annoVis, meseVis, datiGlobali);
+  } catch(e) {
+    stato('❌ Errore: ' + e.message + ' — controlla la connessione o il token', false);
+    document.getElementById('tbody').innerHTML =
+      '<tr><td colspan="14" style="padding:20px;color:#e74c3c;font-size:10pt;">❌ Impossibile caricare i dati.<br>Controlla la connessione internet o contatta l\'amministratore.</td></tr>';
+  }
+}
+
+function avvia() {
+  costruisciIntestazioni();
+  if (!getToken()) {
+    stato('⚠️ Token non configurato', false);
+    mostraSetup();
+  } else {
+    caricaERender();
+  }
+}
+
+avvia();
 </script>
 </body>
 </html>
