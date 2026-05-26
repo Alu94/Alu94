@@ -190,9 +190,42 @@
     .griglia { gap: 4px; padding: 6px 10px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
     .giorno-card { padding: 4px 5px; }
     .giorno-data { font-size: 7pt; }
-    .firma-input { font-size: 7.5pt; padding: 2px 4px; }
-    .note-input  { font-size: 6.5pt; }
-    .firma-input:focus, .note-input:focus { outline: none; }
+
+    /* Campi firma in stampa: linea vuota bianca, nessun placeholder */
+    .firma-input {
+      font-size: 7.5pt;
+      padding: 1px 2px;
+      border: none !important;
+      border-bottom: 1px solid #999 !important;
+      border-radius: 0 !important;
+      background: white !important;
+      color: #000 !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .firma-input::placeholder { color: transparent !important; }
+
+    /* Campi note in stampa: bordo sottile, nessun placeholder */
+    .note-input {
+      font-size: 6.5pt;
+      border: none !important;
+      border-bottom: 1px solid #ddd !important;
+      border-radius: 0 !important;
+      background: white !important;
+      outline: none !important;
+      resize: none;
+    }
+    .note-input::placeholder { color: transparent !important; }
+
+    /* Verifica HACCP */
+    .verifica-item input {
+      border: none !important;
+      border-bottom: 1px solid #999 !important;
+      border-radius: 0 !important;
+      background: white !important;
+      outline: none !important;
+    }
+    .verifica-item input::placeholder { color: transparent !important; }
   }
 </style>
 </head>
