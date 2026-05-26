@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧹 Pulizie Locali — Holiday in Gardan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f4f8; color: #222; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .top-bar {
+    background: #1a5c2a; color: white;
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .top-bar-title { font-size: 14pt; font-weight: bold; }
+  .top-bar-sub   { font-size: 8.5pt; opacity: .8; margin-top: 2px; }
+
+  /* ── NAV TRA I DUE MODULI ── */
+  .nav-moduli {
+    background: #f8f8f8; border-bottom: 2px solid #ddd;
+    padding: 8px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  }
+  .nav-link {
+    padding: 6px 16px; border-radius: 20px; font-size: 10pt; font-weight: bold;
+    text-decoration: none; border: 2px solid #1a5c2a; color: #1a5c2a; background: white;
+    cursor: pointer;
+  }
+  .nav-link.attivo { background: #1a5c2a; color: white; }
+
+  /* ── BARRA MESE ── */
+  .mese-bar {
+    background: #e8f5e9; border-bottom: 2px solid #c8e6c9;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .nav-btn {
+    background: #1a5c2a; color: white; border: none; border-radius: 6px;
+    padding: 8px 18px; font-size: 16pt; cursor: pointer; line-height: 1;
+  }
+  .nav-btn:hover { background: #2e7d32; }
+  .mese-label { font-size: 14pt; font-weight: bold; min-width: 180px; text-align: center; }
+
+  .btn {
+    padding: 8px 18px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 10.5pt; font-weight: bold;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-stampa { background: #1a5c2a; color: white; }
+  .btn-impost { background: #7f8c8d; color: white; }
+  .btn-stampa:hover { background: #2e7d32; }
+
+  /* ── STATO ── */
+  #stato-bar {
+    background: #f1f8e9; border-bottom: 1px solid #c8e6c9;
+    padding: 5px 16px; font-size: 9pt; color: #1a5c2a;
+    display: flex; align-items: center; gap: 8px; min-height: 30px;
+  }
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid #aac; border-top-color: #1a5c2a;
+    border-radius: 50%; animation: spin .7s linear infinite; display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 20px; right: 20px;
+    padding: 10px 20px; border-radius: 8px; font-size: 11pt; font-weight: bold;
+    opacity: 0; transition: opacity .3s; z-index: 9999; pointer-events: none;
+    background: #27ae60; color: white;
+  }
+  #toast.show { opacity: 1; }
+  #toast.errore { background: #e74c3c; }
+
+  /* ── MODAL SETUP ── */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .modal {
+    background: white; border-radius: 10px; padding: 28px 32px;
+    max-width: 480px; width: 94%; box-shadow: 0 8px 32px rgba(0,0,0,.2);
+  }
+  .modal h2 { font-size: 14pt; margin-bottom: 10px; color: #1a5c2a; }
+  .modal p  { font-size: 9.5pt; color: #555; margin-bottom: 14px; line-height: 1.5; }
+  .modal input {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #bbb; border-radius: 6px;
+    font-size: 10pt; margin-bottom: 14px; font-family: monospace;
+  }
+  .modal input:focus { outline: none; border-color: #1a5c2a; }
+  .btn-ok { background: #1a5c2a; color: white; width: 100%; padding: 10px; font-size: 11pt; border: none; border-radius: 6px; cursor: pointer; }
+  .errore-msg { color: #e74c3c; font-size: 9pt; margin-top: -8px; margin-bottom: 10px; display: none; }
+
+  /* ── SEZIONI PULIZIE ── */
+  .contenuto { padding: 12px 14px; }
+
+  .sezione {
+    background: white; border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .sezione-header {
+    padding: 10px 14px; color: white; font-size: 11pt; font-weight: bold;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sezione-descr {
+    padding: 7px 14px; font-size: 8pt; color: #444; line-height: 1.5;
+    background: #f9f9f9; border-bottom: 1px solid #eee;
+  }
+
+  .col-giornaliere { background: #1565c0; }
+  .col-settimanali { background: #6a1b9a; }
+  .col-mensili     { background: #e65100; }
+  .col-trimestrali { background: #4e342e; }
+
+  /* ── GRIGLIA GIORNI ── */
+  .griglia {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px; padding: 10px 14px;
+  }
+  .giorno-card {
+    border: 1.5px solid #e0e0e0; border-radius: 6px;
+    padding: 6px 8px; background: #fafafa;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .giorno-card.oggi-card { border-color: #27ae60; background: #e8f5e9; }
+  .giorno-card.firmato  { border-color: #1565c0; background: #e3f2fd; }
+  .giorno-card.firmato.oggi-card { border-color: #27ae60; background: #e8f5e9; }
+
+  .giorno-data {
+    font-size: 8pt; font-weight: bold; color: #333;
+  }
+  .giorno-data .badge-oggi {
+    font-size: 6.5pt; background: #27ae60; color: white;
+    border-radius: 3px; padding: 1px 4px; margin-left: 4px;
+  }
+  .firma-input {
+    border: 1px solid #ccc; border-radius: 4px; padding: 4px 6px;
+    font-size: 8.5pt; width: 100%; background: white;
+    color: #1a5c2a; font-weight: bold;
+  }
+  .firma-input:focus { outline: none; border-color: #1a5c2a; background: #f1f8e9; }
+  .firma-input.compilato { background: #e3f2fd; border-color: #1565c0; color: #1565c0; }
+  .firma-input::placeholder { color: #bbb; font-weight: normal; font-style: italic; }
+
+  .note-input {
+    border: 1px solid #eee; border-radius: 4px; padding: 3px 5px;
+    font-size: 7.5pt; width: 100%; background: white; color: #666; resize: none;
+  }
+  .note-input:focus { outline: none; border-color: #aaa; }
+
+  /* ── VERIFICA HACCP ── */
+  .verifica-box {
+    background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .verifica-header {
+    background: #37474f; color: white;
+    padding: 10px 14px; font-size: 11pt; font-weight: bold;
+  }
+  .verifica-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; padding: 12px 14px;
+  }
+  .verifica-item label { font-size: 8pt; color: #555; display: block; margin-bottom: 3px; }
+  .verifica-item input {
+    border: 1.5px solid #ccc; border-radius: 4px; padding: 5px 8px;
+    font-size: 9pt; width: 100%;
+  }
+  .verifica-item input:focus { outline: none; border-color: #37474f; }
+
+  /* ── FOOTER ── */
+  .footer-haccp {
+    padding: 6px 16px; font-size: 7pt; color: #999;
+    border-top: 1px solid #ddd; margin-top: 2px;
+  }
+
+  /* ── PRINT ── */
+  @page { size: A4 portrait; margin: 8mm 6mm; }
+  @media print {
+    .top-bar { background: #1a5c2a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; }
+    .nav-moduli, #stato-bar, .no-print { display: none !important; }
+    .mese-bar { background: #e8f5e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; }
+    .contenuto { padding: 4px; }
+    .sezione { box-shadow: none; margin-bottom: 8px; break-inside: avoid; }
+    .sezione-header { padding: 5px 10px; font-size: 9pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .sezione-descr  { padding: 3px 10px; font-size: 6.5pt; }
+    .griglia { gap: 4px; padding: 6px 10px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    .giorno-card { padding: 4px 5px; }
+    .giorno-data { font-size: 7pt; }
+    .firma-input { font-size: 7.5pt; padding: 2px 4px; }
+    .note-input  { font-size: 6.5pt; }
+    .firma-input:focus, .note-input:focus { outline: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MODAL SETUP TOKEN -->
+<div class="overlay" id="modalSetup" style="display:none;">
+  <div class="modal">
+    <h2>🔑 Configurazione iniziale</h2>
+    <p>Inserisci il <strong>Token di accesso GitHub</strong> fornito dall'amministratore.<br>
+    Va fatto <strong>una sola volta</strong> su questo browser.</p>
+    <input type="password" id="inputToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    <div class="errore-msg" id="errToken">❌ Token non valido. Riprova.</div>
+    <button class="btn-ok" onclick="salvaToken()">✅ Conferma e accedi</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- HEADER -->
+<div class="top-bar">
+  <div>
+    <div class="top-bar-title">🧹 Controllo Pulizia Locali e Attrezzature</div>
+    <div class="top-bar-sub">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan" — HACCP All. A - Mod. 07</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;" class="no-print">
+    <button class="btn btn-stampa" onclick="window.print()">🖨️ Stampa</button>
+    <button class="btn btn-impost" onclick="mostraImpostazioni()">⚙️ Impostazioni</button>
+  </div>
+</div>
+
+<!-- NAV MODULI -->
+<div class="nav-moduli no-print">
+  <a class="nav-link" href="https://beautiful-dasik-cbcbcf.netlify.app/temperature_dipendenti.html">🌡️ Temperature</a>
+  <a class="nav-link attivo" href="https://beautiful-dasik-cbcbcf.netlify.app/pulizie_dipendenti.html">🧹 Pulizie</a>
+</div>
+
+<!-- BARRA MESE -->
+<div class="mese-bar no-print">
+  <button class="nav-btn" onclick="cambiaMese(-1)">‹</button>
+  <div class="mese-label" id="labelMese">—</div>
+  <button class="nav-btn" onclick="cambiaMese(+1)">›</button>
+  <span style="font-size:8.5pt;color:#555;margin-left:6px;">
+    💡 Clicca su un campo firma per firmare — si salva automaticamente
+  </span>
+</div>
+
+<!-- STATO -->
+<div id="stato-bar" class="no-print">
+  <div class="spinner" id="spinner"></div>
+  <span id="stato-msg">Caricamento...</span>
+</div>
+
+<!-- CONTENUTO -->
+<div class="contenuto" id="contenuto">
+  <p style="padding:30px;color:#999;text-align:center;">⏳ Caricamento dati in corso...</p>
+</div>
+
+<div class="footer-haccp">
+  Servizio e controllo HACCP realizzato in collaborazione con: <strong>TS SICUREZZA S.r.l. - Trento</strong>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+var REPO       = 'Alu94/haccp-holiday-gardan';
+var DATA_PATH  = 'output/pulizie/data.json';
+var API        = 'https://api.github.com/repos/' + REPO + '/contents/' + DATA_PATH;
+
+var MESI = ['','Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+            'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+var GIORNI_SETTIMANA = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+var oggi    = new Date();
+var annoVis = oggi.getFullYear();
+var meseVis = oggi.getMonth() + 1;
+var datiGlobali = {};
+var shaGlobale  = null;
+var toastTimer  = null;
+
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function pad(n) { return n < 10 ? '0'+n : ''+n; }
+function isoDate(a,m,g) { return a+'-'+pad(m)+'-'+pad(g); }
+function getToken() { return localStorage.getItem('haccp_token') || ''; }
+function chiaveMese(a,m) { return a+'-'+pad(m); }
+
+function stato(msg, loading) {
+  document.getElementById('stato-msg').textContent = msg;
+  document.getElementById('spinner').style.display = loading ? 'block' : 'none';
+}
+function toast(msg, err) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (err ? ' errore' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.className = ''; }, 2200);
+}
+function oggiStr() {
+  return isoDate(oggi.getFullYear(), oggi.getMonth()+1, oggi.getDate());
+}
+
+// ═══════════════════════════════════════════════════════
+//  TOKEN / SETUP
+// ═══════════════════════════════════════════════════════
+function mostraSetup() {
+  document.getElementById('modalSetup').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('inputToken').focus(); }, 100);
+}
+function mostraImpostazioni() {
+  document.getElementById('errToken').style.display = 'none';
+  document.getElementById('inputToken').value = '';
+  mostraSetup();
+}
+async function salvaToken() {
+  var tok = document.getElementById('inputToken').value.trim();
+  if (!tok) return;
+  stato('Verifica token...', true);
+  try {
+    var r = await fetch(API, { headers: { 'Authorization': 'token '+tok, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!r.ok) throw new Error();
+    localStorage.setItem('haccp_token', tok);
+    document.getElementById('modalSetup').style.display = 'none';
+    await caricaERender();
+  } catch(e) {
+    stato('', false);
+    document.getElementById('errToken').style.display = 'block';
+  }
+}
+document.getElementById('inputToken').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') salvaToken();
+});
+
+// ═══════════════════════════════════════════════════════
+//  GITHUB API
+// ═══════════════════════════════════════════════════════
+async function caricaDatiGitHub() {
+  var r = await fetch(API + '?t=' + Date.now(), {
+    headers: { 'Authorization': 'token '+getToken(), 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  var json   = await r.json();
+  shaGlobale = json.sha;
+  var binary = atob(json.content.replace(/\n/g,''));
+  var bytes  = new Uint8Array(binary.length);
+  for (var i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+}
+
+async function salvaDatiGitHub() {
+  var rCheck = await fetch(API + '?t=' + Date.now(), {
+    headers: { 'Authorization': 'token '+getToken(), 'Accept': 'application/vnd.github.v3+json' }
+  });
+  shaGlobale = (await rCheck.json()).sha;
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(datiGlobali, null, 2))));
+  var dataOggi = pad(oggi.getDate())+'/'+pad(oggi.getMonth()+1)+'/'+oggi.getFullYear();
+  var r = await fetch(API, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token '+getToken(),
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: '✏️ Firma pulizie ' + dataOggi,
+      content: encoded,
+      sha: shaGlobale
+    })
+  });
+  if (!r.ok) throw new Error('Errore ' + r.status);
+  shaGlobale = (await r.json()).content.sha;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════════
+function renderPagina(a, m) {
+  document.getElementById('labelMese').textContent = MESI[m] + ' ' + a;
+  var k    = chiaveMese(a, m);
+  var piano = datiGlobali[k];
+
+  if (!piano) {
+    document.getElementById('contenuto').innerHTML =
+      '<div style="padding:30px;text-align:center;color:#e67e22;font-size:11pt;">⚠️ Nessun piano trovato per '+MESI[m]+' '+a+'.<br><small>Il piano viene creato automaticamente dal bot alle 07:00 del 1° del mese.</small></div>';
+    return;
+  }
+
+  // Assicura struttura firme
+  if (!piano.firme) piano.firme = {};
+  if (!piano.note_firme) piano.note_firme = {};
+
+  var html = '';
+
+  // ── PULIZIE GIORNALIERE ──
+  html += sezioneHtml('giornaliere', '📅 Pulizie Giornaliere', 'col-giornaliere',
+    'CUCINA: pavimenti, lavelli, coltelli, utensili, superfici, affettatrici, taglieri, piastre di cottura. ' +
+    'MAGAZZINO: pavimenti. BAR: vetrinette, erogatori bevande. SALA: vetrinette, erogatori bevande. ' +
+    'SERVIZI IGIENICI: pavimenti, cestini, specchi, rubinetti, sanitari.',
+    piano.tutti_giorni, a, m, piano, 'gg');
+
+  // ── PULIZIE SETTIMANALI ──
+  html += sezioneHtml('settimanali', '📆 Pulizie Settimanali', 'col-settimanali',
+    'CUCINA: cappe, frigoriferi, pareti lavabili, armadi, ripiani, scaffali, maniglie, porte, friggitrice, cassetti. ' +
+    'BAR/SALA: frigoriferi, portaposate, scaldapiatti. MAGAZZINO: scaffali, maniglie, pareti. ' +
+    'SERVIZI IGIENICI: disincrostazione rubinetterie e sanitari, pareti piastrellate.',
+    piano.settimanali, a, m, piano, 'sw');
+
+  // ── PULIZIE MENSILI ──
+  html += sezioneHtml('mensili', '🗓️ Pulizie Mensili', 'col-mensili',
+    'CUCINA: compressori, radiatori, soffitto e pareti. MAGAZZINO: ripiani, soffitto, pareti. ' +
+    'SERVIZI IGIENICI: vetri, plafoniere.',
+    piano.mensili, a, m, piano, 'mm');
+
+  // ── PULIZIE TRIMESTRALI ──
+  var giorniTrim = piano.trimestrale ? [piano.trimestrale] : [];
+  if (giorniTrim.length > 0) {
+    html += sezioneHtml('trimestrali', '📋 Pulizie Trimestrali', 'col-trimestrali',
+      'TUTTE LE AREE: derattizzazione e deblattizzazione (ev. ditte specializzate). Monitoraggio derattizzazione.',
+      giorniTrim, a, m, piano, 'tr');
+  } else {
+    html += '<div class="sezione"><div class="sezione-header col-trimestrali">📋 Pulizie Trimestrali</div>' +
+            '<div class="sezione-descr" style="padding:10px 14px;color:#888;">Non previste questo mese (previste nei mesi: Marzo, Giugno, Settembre, Dicembre).</div></div>';
+  }
+
+  // ── VERIFICA HACCP ──
+  var vf1 = (piano.firme && piano.firme['verifica_1']) || '';
+  var vf2 = (piano.firme && piano.firme['verifica_2']) || '';
+  var vi1 = (piano.note_firme && piano.note_firme['verifica_1']) || '';
+  var vi2 = (piano.note_firme && piano.note_firme['verifica_2']) || '';
+  html += '<div class="verifica-box">' +
+    '<div class="verifica-header">✅ Verifica bimensile stato pulizie — Responsabile HACCP</div>' +
+    '<div class="verifica-grid">' +
+    '<div class="verifica-item"><label>Firma Resp. HACCP (1)</label>' +
+    '<input type="text" value="'+vf1+'" placeholder="Firma..." data-chiave="verifica_1" data-tipo="firma" onblur="salvaVerifica(this)"></div>' +
+    '<div class="verifica-item"><label>Intervento correttivo (1)</label>' +
+    '<input type="text" value="'+vi1+'" placeholder="Note..." data-chiave="verifica_1" data-tipo="nota" onblur="salvaVerifica(this)"></div>' +
+    '<div class="verifica-item"><label>Firma Resp. HACCP (2)</label>' +
+    '<input type="text" value="'+vf2+'" placeholder="Firma..." data-chiave="verifica_2" data-tipo="firma" onblur="salvaVerifica(this)"></div>' +
+    '<div class="verifica-item"><label>Intervento correttivo (2)</label>' +
+    '<input type="text" value="'+vi2+'" placeholder="Note..." data-chiave="verifica_2" data-tipo="nota" onblur="salvaVerifica(this)"></div>' +
+    '</div></div>';
+
+  document.getElementById('contenuto').innerHTML = html;
+}
+
+function sezioneHtml(tipo, titolo, colClass, descr, giorni, a, m, piano, prefisso) {
+  var oggiK = oggiStr();
+  var html  = '<div class="sezione">' +
+    '<div class="sezione-header '+colClass+'">'+titolo+'</div>' +
+    '<div class="sezione-descr">'+descr+'</div>' +
+    '<div class="griglia">';
+
+  giorni.forEach(function(g) {
+    var k    = isoDate(a, m, g);
+    var dData = new Date(a, m-1, g);
+    var gSett = GIORNI_SETTIMANA[dData.getDay()];
+    var isOggi = (k === oggiK);
+    var firma = (piano.firme && piano.firme[prefisso+'_'+k]) || '';
+    var nota  = (piano.note_firme && piano.note_firme[prefisso+'_'+k]) || '';
+    var firmato = firma.length > 0;
+
+    html += '<div class="giorno-card'+(isOggi?' oggi-card':'')+(firmato?' firmato':'')+'">'+
+      '<div class="giorno-data">'+pad(g)+'/'+pad(m)+'/'+a+' '+gSett+
+      (isOggi ? '<span class="badge-oggi">OGGI</span>' : '')+
+      '</div>'+
+      '<input type="text" class="firma-input'+(firmato?' compilato':'')+'" '+
+        'value="'+firma+'" placeholder="Firma..." '+
+        'data-k="'+k+'" data-prefisso="'+prefisso+'" data-tipo="firma" '+
+        'onblur="salvaFirma(this)" onfocus="this.select()">'+
+      '<textarea class="note-input" rows="1" placeholder="Note..." '+
+        'data-k="'+k+'" data-prefisso="'+prefisso+'" data-tipo="nota" '+
+        'onblur="salvaFirma(this)">'+nota+'</textarea>'+
+      '</div>';
+  });
+
+  html += '</div></div>';
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SALVATAGGIO
+// ═══════════════════════════════════════════════════════
+async function salvaFirma(el) {
+  var k       = el.dataset.k;
+  var prefisso = el.dataset.prefisso;
+  var tipo    = el.dataset.tipo;
+  var val     = el.value.trim();
+  var km      = chiaveMese(annoVis, meseVis);
+
+  if (!datiGlobali[km].firme)      datiGlobali[km].firme = {};
+  if (!datiGlobali[km].note_firme) datiGlobali[km].note_firme = {};
+
+  var chiaveVal = prefisso + '_' + k;
+  if (tipo === 'firma') {
+    datiGlobali[km].firme[chiaveVal] = val;
+    // Aggiorna stile card
+    var card = el.closest('.giorno-card');
+    if (card) {
+      if (val) { card.classList.add('firmato'); el.classList.add('compilato'); }
+      else      { card.classList.remove('firmato'); el.classList.remove('compilato'); }
+    }
+  } else {
+    datiGlobali[km].note_firme[chiaveVal] = val;
+  }
+
+  stato('💾 Salvataggio...', true);
+  try {
+    await salvaDatiGitHub();
+    stato('✅ Salvato — ' + new Date().toLocaleTimeString('it-IT'), false);
+    toast('✅ Salvato!');
+  } catch(e) {
+    stato('❌ Errore: ' + e.message, false);
+    toast('❌ Errore connessione', true);
+  }
+}
+
+async function salvaVerifica(el) {
+  var chiave = el.dataset.chiave;
+  var tipo   = el.dataset.tipo;
+  var val    = el.value.trim();
+  var km     = chiaveMese(annoVis, meseVis);
+
+  if (!datiGlobali[km].firme)      datiGlobali[km].firme = {};
+  if (!datiGlobali[km].note_firme) datiGlobali[km].note_firme = {};
+
+  if (tipo === 'firma') datiGlobali[km].firme[chiave] = val;
+  else                  datiGlobali[km].note_firme[chiave] = val;
+
+  stato('💾 Salvataggio...', true);
+  try {
+    await salvaDatiGitHub();
+    stato('✅ Salvato — ' + new Date().toLocaleTimeString('it-IT'), false);
+    toast('✅ Salvato!');
+  } catch(e) {
+    stato('❌ Errore: ' + e.message, false);
+    toast('❌ Errore connessione', true);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGAZIONE MESE
+// ═══════════════════════════════════════════════════════
+function cambiaMese(delta) {
+  meseVis += delta;
+  if (meseVis > 12) { meseVis = 1;  annoVis++; }
+  if (meseVis < 1)  { meseVis = 12; annoVis--; }
+  renderPagina(annoVis, meseVis);
+}
+
+// ═══════════════════════════════════════════════════════
+//  AVVIO
+// ═══════════════════════════════════════════════════════
+async function caricaERender() {
+  stato('📡 Caricamento da GitHub...', true);
+  try {
+    datiGlobali = await caricaDatiGitHub();
+    stato('✅ Dati aggiornati alle ' + new Date().toLocaleTimeString('it-IT'), false);
+    renderPagina(annoVis, meseVis);
+  } catch(e) {
+    stato('❌ Errore: ' + e.message, false);
+    document.getElementById('contenuto').innerHTML =
+      '<div style="padding:30px;color:#e74c3c;text-align:center;">❌ Impossibile caricare i dati.<br>Controlla la connessione o il token.</div>';
+  }
+}
+
+function avvia() {
+  if (!getToken()) { stato('⚠️ Token non configurato', false); mostraSetup(); }
+  else caricaERender();
+}
+avvia();
+</script>
+</body>
+</html>

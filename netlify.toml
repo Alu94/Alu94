@@ -2,3 +2,13 @@
   from = "/"
   to   = "/temperature_dipendenti.html"
   status = 302
+
+[[redirects]]
+  from = "/temperature"
+  to   = "/temperature_dipendenti.html"
+  status = 302
+
+[[redirects]]
+  from = "/pulizie"
+  to   = "/pulizie_dipendenti.html"
+  status = 302
