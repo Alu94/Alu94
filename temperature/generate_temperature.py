@@ -95,20 +95,25 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
             data_str   = riga["data"]
             orario_str = riga["orario"]
             celle_temp = "".join(
-                f'<td class="temp">{riga["temperature"].get(str(f["numero"]), "")}</td>'
+                f'<td class="temp" contenteditable="false" data-key="{chiave}" data-frigo="{f["numero"]}">{riga["temperature"].get(str(f["numero"]), "")}</td>'
                 for f in FRIGHI
             )
+            ora_attr = f'contenteditable="false" data-key="{chiave}" data-campo="orario"'
         else:
             data_str   = giorno.strftime("%d/%m/%Y")
             orario_str = ""
-            celle_temp = "".join('<td class="temp vuoto"></td>' for _ in FRIGHI)
+            celle_temp = "".join(
+                f'<td class="temp vuoto" contenteditable="false" data-key="{chiave}" data-frigo="{f["numero"]}"></td>'
+                for f in FRIGHI
+            )
+            ora_attr = f'contenteditable="false" data-key="{chiave}" data-campo="orario"'
 
         righe_html += f"""<tr>
             <td class="data">{data_str}</td>
-            <td class="orario">{orario_str}</td>
+            <td class="orario" {ora_attr}>{orario_str}</td>
             {celle_temp}
             <td class="firma"></td>
-            <td class="note"></td>
+            <td class="note" contenteditable="false"></td>
           </tr>"""
 
     # Intestazioni frighi (compatte)
@@ -221,30 +226,113 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     line-height: 1.4;
   }}
 
-  /* Bottone stampa (solo schermo) */
+  /* Bottoni (solo schermo) */
   @media screen {{
-    .btn-wrap {{ text-align: center; padding: 6px; }}
-    .btn-stampa {{
-      padding: 7px 20px;
-      background: #154360;
-      color: #fff;
+    .btn-wrap {{
+      text-align: center;
+      padding: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }}
+    .btn {{
+      padding: 7px 18px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-size: 10pt;
+      font-weight: bold;
     }}
+    .btn-stampa   {{ background: #154360; color: #fff; }}
+    .btn-modifica {{ background: #e67e22; color: #fff; }}
+    .btn-salva    {{ background: #27ae60; color: #fff; display: none; }}
+    .btn-annulla  {{ background: #c0392b; color: #fff; display: none; }}
+
+    body.edit-mode td[contenteditable="true"] {{
+      background: #fff9e6 !important;
+      outline: 1.5px dashed #e67e22;
+      cursor: text;
+    }}
+    body.edit-mode td[contenteditable="true"]:focus {{
+      background: #fffbe6 !important;
+      outline: 2px solid #e67e22;
+    }}
+    .edit-banner {{
+      display: none;
+      background: #fef9e7;
+      border: 1.5px solid #e67e22;
+      color: #784212;
+      font-size: 8.5pt;
+      padding: 4px 10px;
+      text-align: center;
+      border-radius: 4px;
+      margin: 4px 0;
+    }}
+    body.edit-mode .edit-banner {{ display: block; }}
   }}
   @media print {{
-    .btn-wrap {{ display: none; }}
+    .btn-wrap    {{ display: none; }}
+    .edit-banner {{ display: none; }}
     body {{ font-size: 6pt; }}
+    td[contenteditable] {{ outline: none !important; }}
   }}
 </style>
 </head>
 <body>
 
 <div class="btn-wrap">
-  <button class="btn-stampa" onclick="window.print()">🖨️ Stampa / Salva PDF</button>
+  <button class="btn btn-stampa"   onclick="window.print()">🖨️ Stampa / Salva PDF</button>
+  <button class="btn btn-modifica" id="btnMod"     onclick="attivaModifica()">✏️ Modifica dati</button>
+  <button class="btn btn-salva"    id="btnSalva"   onclick="salvaDati()">💾 Scarica dati aggiornati</button>
+  <button class="btn btn-annulla"  id="btnAnnulla" onclick="location.reload()">✖ Annulla</button>
 </div>
+<div class="edit-banner">
+  ✏️ <strong>Modalità modifica attiva</strong> — clicca su qualsiasi temperatura o orario per correggerlo.
+  Quando hai finito clicca <strong>💾 Scarica dati aggiornati</strong> e carica il file <code>data.json</code> su GitHub in <code>output/temperature/</code>.
+</div>
+
+<script>
+function attivaModifica() {{
+  document.body.classList.add('edit-mode');
+  document.querySelectorAll('td.temp, td.orario, td.note').forEach(function(td) {{
+    td.setAttribute('contenteditable', 'true');
+  }});
+  document.getElementById('btnMod').style.display     = 'none';
+  document.getElementById('btnSalva').style.display   = 'inline-block';
+  document.getElementById('btnAnnulla').style.display = 'inline-block';
+}}
+
+function salvaDati() {{
+  var dati = {{}};
+
+  document.querySelectorAll('td.orario[data-key]').forEach(function(td) {{
+    var k = td.dataset.key;
+    if (!dati[k]) dati[k] = {{ data: '', orario: '', temperature: {{}} }};
+    dati[k].orario = td.innerText.trim();
+    dati[k].data   = td.previousElementSibling ? td.previousElementSibling.innerText.trim() : '';
+  }});
+
+  document.querySelectorAll('td.temp[data-key]').forEach(function(td) {{
+    var k  = td.dataset.key;
+    var fr = td.dataset.frigo;
+    if (!dati[k]) dati[k] = {{ data: '', orario: '', temperature: {{}} }};
+    if (!dati[k].temperature) dati[k].temperature = {{}};
+    var val = td.innerText.trim();
+    if (val) dati[k].temperature[fr] = val;
+  }});
+
+  var blob = new Blob([JSON.stringify(dati, null, 2)], {{type: 'application/json'}});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+
+  setTimeout(function() {{
+    alert('✅ File data.json scaricato!\\n\\nOra vai su GitHub:\\ngithub.com/Alu94/haccp-holiday-gardan\\n→ output/temperature/data.json\\n→ ✏️ icona matita → incolla il contenuto → Commit\\n\\nDomani alle 07:00 il file HTML si aggiornerà.');
+  }}, 500);
+}}
+</script>
 
 <div class="hdr">
   <span class="hdr-mod">Mod. 10</span>
