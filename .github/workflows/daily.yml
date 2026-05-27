@@ -2,27 +2,29 @@ name: 🏨 HACCP Autocompilazione Giornaliera
 
 on:
   schedule:
-    # Ogni giorno alle 07:00 ora italiana (UTC+2 in estate → 05:00 UTC)
+    # Ogni giorno alle 07:00 ora italiana estiva (UTC+2 → 05:00 UTC)
     - cron: '0 5 * * *'
   workflow_dispatch:
-    # Permette anche l'avvio manuale dalla pagina GitHub Actions
     inputs:
       data:
         description: 'Data specifica (YYYY-MM-DD) — lascia vuoto per oggi'
         required: false
         default: ''
+  push:
+    branches: [ main ]
 
 jobs:
   compila-haccp:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # necessario per fare commit
+      contents: write
 
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
@@ -42,6 +44,5 @@ jobs:
           git config user.name  "HACCP Bot 🤖"
           git config user.email "haccp-bot@holiday-gardan.it"
           git add output/
-          # Commit solo se ci sono cambiamenti
           git diff --staged --quiet || git commit -m "🌡️ HACCP aggiornamento automatico $(date +'%d/%m/%Y')"
           git push
