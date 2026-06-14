@@ -17,7 +17,6 @@
     background: #fff;
   }
 
-  /* Intestazione azienda */
   .hdr {
     display: flex;
     justify-content: space-between;
@@ -34,7 +33,6 @@
   .hdr-sub { font-size: 6pt; font-style: italic; color: #333; }
   .hdr-mod  { font-size: 6pt; color: #666; white-space: nowrap; }
 
-  /* Titolo */
   .titolo {
     font-size: 9pt;
     font-weight: bold;
@@ -52,7 +50,6 @@
     margin-bottom: 1.5mm;
   }
 
-  /* Tabella */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -64,20 +61,20 @@
     text-align: center;
     vertical-align: middle;
     line-height: 1.1;
+    overflow: hidden;
   }
   thead th {
     background: #cfe2f3;
     font-size: 5.5pt;
   }
-  .frigo-header { width: 7.6%; }
+  .frigo-header { width: 7%; }
   .fn { font-size: 5.5pt; font-weight: bold; display: block; }
   .fp { font-size: 4.5pt; color: #333; display: block; }
   .fr { font-size: 4.5pt; color: #900; font-weight: bold; display: block; }
 
-  .col-data   { width: 6%; }
-  .col-ora    { width: 4.5%; }
-  .col-firma  { width: 6%; }
-  .col-note   { width: 7%; }
+  .col-data  { width: 7%; }
+  .col-ora   { width: 5%; }
+  .col-firma { width: 18%; }
 
   tbody tr { height: 4.8mm; }
   tbody tr:nth-child(even) { background: #f7fbff; }
@@ -87,9 +84,7 @@
   td.temp   { font-size: 6.5pt; font-weight: bold; color: #154360; }
   td.vuoto  { background: #fafafa; }
   td.firma  { background: #fffde7; }
-  td.note   { background: #fff8f8; font-size: 5pt; }
 
-  /* Footer note */
   .footer {
     margin-top: 1mm;
     font-size: 5pt;
@@ -99,7 +94,6 @@
     line-height: 1.4;
   }
 
-  /* Bottoni (solo schermo) */
   @media screen {
     .btn-wrap {
       text-align: center;
@@ -149,6 +143,7 @@
     .edit-banner { display: none; }
     body { font-size: 6pt; }
     td[contenteditable] { outline: none !important; }
+    table { page-break-inside: avoid; }
   }
 </style>
 </head>
@@ -168,7 +163,7 @@
 <script>
 function attivaModifica() {
   document.body.classList.add('edit-mode');
-  document.querySelectorAll('td.temp, td.orario, td.note').forEach(function(td) {
+  document.querySelectorAll('td.temp, td.orario').forEach(function(td) {
     td.setAttribute('contenteditable', 'true');
   });
   document.getElementById('btnMod').style.display     = 'none';
@@ -239,7 +234,7 @@ function salvaDati() {
           </th><th class="frigo-header">
             <span class="fn">Freezer n°4</span><br>
             <span class="fp">Cucina</span><br>
-            <span class="fr">-16/-18°C</span>
+            <span class="fr">-15/-17°C</span>
           </th><th class="frigo-header">
             <span class="fn">Frigo Grande n°5</span><br>
             <span class="fp">Cucina</span><br>
@@ -255,7 +250,7 @@ function salvaDati() {
           </th><th class="frigo-header">
             <span class="fn">Freezer n°8</span><br>
             <span class="fp">Magazzino</span><br>
-            <span class="fr">-16/-18°C</span>
+            <span class="fr">-18/-22°C</span>
           </th><th class="frigo-header">
             <span class="fn">Freezer n°9</span><br>
             <span class="fp">Magazzino</span><br>
@@ -266,203 +261,171 @@ function salvaDati() {
             <span class="fr">+4/6°C</span>
           </th>
       <th class="col-firma">FIRMA</th>
-      <th class="col-note">Note superamento<br>valori limite (*)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
             <td class="data">01/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-01" data-campo="orario">09:56</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="1">+5.9</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="2">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="3">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="4">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="5">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="6">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="7">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="8">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="9">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-01" data-frigo="10">+5.9</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-01" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-01" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">02/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-02" data-campo="orario">08:28</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="1">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="2">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="3">+4.3</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="4">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="5">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="6">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="7">-17.9</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="8">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="9">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-02" data-frigo="10">+4.8</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-02" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-02" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">03/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-03" data-campo="orario">10:11</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="1">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="2">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="3">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="4">-17.8</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="5">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="6">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="7">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="8">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="9">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-03" data-frigo="10">+5.0</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-03" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-03" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">04/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-04" data-campo="orario">09:49</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="1">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="2">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="3">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="4">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="5">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="6">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="7">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="8">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="9">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-04" data-frigo="10">+4.6</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-04" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-04" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">05/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-05" data-campo="orario">08:28</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="1">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="2">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="3">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="4">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="5">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="6">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="7">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="8">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="9">-17.9</td><td class="temp" contenteditable="false" data-key="2025-12-05" data-frigo="10">+5.7</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-05" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-05" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">06/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-06" data-campo="orario">09:02</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="1">+4.8</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="2">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="3">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="4">-16.1</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="5">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="6">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="7">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="8">-17.7</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="9">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-06" data-frigo="10">+4.4</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-06" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-06" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">07/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-07" data-campo="orario">09:50</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="1">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="2">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="3">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="4">-17.0</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="5">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="6">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="7">-18.0</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="8">-18.0</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="9">-17.0</td><td class="temp" contenteditable="false" data-key="2025-12-07" data-frigo="10">+4.4</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-07" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-07" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">08/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-08" data-campo="orario">10:26</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="1">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="2">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="3">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="4">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="5">+6.0</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="6">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="7">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="8">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="9">-17.8</td><td class="temp" contenteditable="false" data-key="2025-12-08" data-frigo="10">+4.8</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-08" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-08" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">09/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-09" data-campo="orario">08:33</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="1">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="2">+6.0</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="3">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="4">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="5">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="6">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="7">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="8">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="9">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-09" data-frigo="10">+5.5</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-09" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-09" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">10/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-10" data-campo="orario">10:29</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="1">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="2">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="3">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="4">-17.4</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="5">+4.3</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="6">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="7">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="8">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="9">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-10" data-frigo="10">+4.6</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-10" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-10" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">11/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-11" data-campo="orario">10:02</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="1">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="2">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="3">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="4">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="5">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="6">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="7">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="8">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="9">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-11" data-frigo="10">+4.2</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-11" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-11" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">12/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-12" data-campo="orario">08:22</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="1">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="2">+5.9</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="3">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="4">-17.4</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="5">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="6">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="7">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="8">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="9">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-12" data-frigo="10">+4.0</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-12" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-12" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">13/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-13" data-campo="orario">10:16</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="1">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="2">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="3">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="4">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="5">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="6">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="7">-17.9</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="8">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="9">-17.0</td><td class="temp" contenteditable="false" data-key="2025-12-13" data-frigo="10">+4.9</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-13" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-13" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">14/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-14" data-campo="orario">09:59</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="1">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="2">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="3">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="4">-17.7</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="5">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="6">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="7">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="8">-16.1</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="9">-17.8</td><td class="temp" contenteditable="false" data-key="2025-12-14" data-frigo="10">+4.4</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-14" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-14" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">15/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-15" data-campo="orario">08:29</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="1">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="2">+5.9</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="3">+5.9</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="4">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="5">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="6">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="7">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="8">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="9">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-15" data-frigo="10">+4.5</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-15" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-15" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">16/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-16" data-campo="orario">09:23</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="1">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="2">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="3">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="4">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="5">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="6">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="7">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="8">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="9">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-16" data-frigo="10">+4.1</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-16" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-16" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">17/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-17" data-campo="orario">09:34</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="1">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="2">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="3">+4.3</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="4">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="5">+4.3</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="6">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="7">-17.8</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="8">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="9">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-17" data-frigo="10">+5.6</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-17" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-17" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">18/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-18" data-campo="orario">10:26</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="1">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="2">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="3">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="4">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="5">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="6">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="7">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="8">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="9">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-18" data-frigo="10">+5.3</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-18" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-18" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">19/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-19" data-campo="orario">09:36</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="1">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="2">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="3">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="4">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="5">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="6">+4.0</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="7">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="8">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="9">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-19" data-frigo="10">+4.2</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-19" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-19" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">20/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-20" data-campo="orario">08:48</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="1">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="2">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="3">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="4">-17.5</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="5">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="6">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="7">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="8">-16.1</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="9">-16.8</td><td class="temp" contenteditable="false" data-key="2025-12-20" data-frigo="10">+5.3</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-20" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-20" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">21/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-21" data-campo="orario">10:23</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="1">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="2">+4.7</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="3">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="4">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="5">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="6">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="7">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="8">-17.4</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="9">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-21" data-frigo="10">+5.3</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-21" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-21" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">22/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-22" data-campo="orario">09:05</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="1">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="2">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="3">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="4">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="5">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="6">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="7">-17.5</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="8">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="9">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-22" data-frigo="10">+4.1</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-22" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-22" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">23/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-23" data-campo="orario">09:07</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="1">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="2">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="3">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="4">-17.4</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="5">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="6">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="7">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="8">-17.3</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="9">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-23" data-frigo="10">+4.4</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-23" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-23" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">24/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-24" data-campo="orario">09:04</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="1">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="2">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="3">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="4">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="5">+5.6</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="6">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="7">-17.0</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="8">-17.0</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="9">-17.1</td><td class="temp" contenteditable="false" data-key="2025-12-24" data-frigo="10">+4.0</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-24" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-24" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">25/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-25" data-campo="orario">08:59</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="1">+5.2</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="2">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="3">+6.0</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="4">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="5">+5.3</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="6">+4.8</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="7">-18.0</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="8">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="9">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-25" data-frigo="10">+4.6</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-25" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-25" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">26/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-26" data-campo="orario">10:06</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="1">+4.9</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="2">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="3">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="4">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="5">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="6">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="7">-16.8</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="8">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="9">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-26" data-frigo="10">+5.5</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-26" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-26" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">27/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-27" data-campo="orario">09:43</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="1">+4.2</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="2">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="3">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="4">-16.6</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="5">+4.1</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="6">+5.0</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="7">-16.7</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="8">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="9">-17.6</td><td class="temp" contenteditable="false" data-key="2025-12-27" data-frigo="10">+5.2</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-27" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-27" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">28/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-28" data-campo="orario">08:14</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="1">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="2">+4.8</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="3">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="4">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="5">+5.7</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="6">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="7">-16.3</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="8">-17.9</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="9">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-28" data-frigo="10">+5.6</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-28" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-28" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">29/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-29" data-campo="orario">09:08</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="1">+4.6</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="2">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="3">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="4">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="5">+4.0</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="6">+5.5</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="7">-16.2</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="8">-17.2</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="9">-17.5</td><td class="temp" contenteditable="false" data-key="2025-12-29" data-frigo="10">+6.0</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-29" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-29" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">30/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-30" data-campo="orario">09:07</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="1">+6.0</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="2">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="3">+4.5</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="4">-16.9</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="5">+5.4</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="6">+5.1</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="7">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="8">-16.4</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="9">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-30" data-frigo="10">+4.5</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-30" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-30" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr><tr>
             <td class="data">31/12/2025</td>
-            <td class="orario" contenteditable="false" data-key="2025-12-31" data-campo="orario">10:17</td>
-            <td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="1">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="2">+5.8</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="3">+4.4</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="4">-16.5</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="5">+4.8</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="6">+4.3</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="7">-16.0</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="8">-16.1</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="9">-18.0</td><td class="temp" contenteditable="false" data-key="2025-12-31" data-frigo="10">+4.0</td>
+            <td class="orario" contenteditable="false" data-key="2025-12-31" data-campo="orario"></td>
+            <td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="1"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="2"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="3"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="4"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="5"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="6"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="7"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="8"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="9"></td><td class="temp vuoto" contenteditable="false" data-key="2025-12-31" data-frigo="10"></td>
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr>
   </tbody>
 </table>
 
 <div class="footer">
-  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi &nbsp;|&nbsp;
   NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). &nbsp;|&nbsp;
+  In caso di superamento: istruzione al personale / riparazione / regolazione / eventuale smaltimento alimenti. &nbsp;|&nbsp;
   Servizio e controllo HACCP: <strong>TS SICUREZZA S.r.l. - Trento</strong>
 </div>
 

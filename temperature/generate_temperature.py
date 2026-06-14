@@ -8,22 +8,31 @@ Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 import os
 import json
 import random
-from datetime import date
+from datetime import date, timedelta
 import calendar
 
 # ─── Configurazione frighi ────────────────────────────────────────────────────
 FRIGHI = [
-    {"numero": 1,  "nome": "Frigo n°1",          "posizione": "Bar",              "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 2,  "nome": "Frigo n°2",           "posizione": "Vetrina Sala/Bar", "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 3,  "nome": "Frigo n°3",           "posizione": "Vetrina Servizio", "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 4,  "nome": "Freezer n°4",         "posizione": "Cucina",           "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 5,  "nome": "Frigo Grande n°5",    "posizione": "Cucina",           "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 6,  "nome": "Frigo Piccolo n°6",   "posizione": "Cucina",           "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 7,  "nome": "Freezer n°7",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 8,  "nome": "Freezer n°8",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 9,  "nome": "Freezer n°9",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 10, "nome": "Frigo n°10",          "posizione": "Magazzino",        "tipo": "frigo",   "temp_rif": "+4/6°C"},
+    {"numero": 1,  "nome": "Frigo n°1",          "posizione": "Bar",              "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 2,  "nome": "Frigo n°2",           "posizione": "Vetrina Sala/Bar", "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 3,  "nome": "Frigo n°3",           "posizione": "Vetrina Servizio", "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 4,  "nome": "Freezer n°4",         "posizione": "Cucina",           "tipo": "freezer", "t_min": 15.0, "t_max": 17.0, "temp_rif": "-15/-17°C"},
+    {"numero": 5,  "nome": "Frigo Grande n°5",    "posizione": "Cucina",           "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 6,  "nome": "Frigo Piccolo n°6",   "posizione": "Cucina",           "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 7,  "nome": "Freezer n°7",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
+    {"numero": 8,  "nome": "Freezer n°8",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 18.0, "t_max": 22.0, "temp_rif": "-18/-22°C"},
+    {"numero": 9,  "nome": "Freezer n°9",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
+    {"numero": 10, "nome": "Frigo n°10",          "posizione": "Magazzino",        "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
 ]
+
+# ─── Periodi di apertura hotel ────────────────────────────────────────────────
+PERIODI_APERTURA = [
+    (date(2025, 4, 12), date(2025, 11, 2)),
+    (date(2026, 4, 5),  date(2026, 12, 31)),
+]
+
+def hotel_aperto(giorno: date) -> bool:
+    return any(inizio <= giorno <= fine for inizio, fine in PERIODI_APERTURA)
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output", "temperature")
 DATA_FILE  = os.path.join(os.path.dirname(__file__), "..", "output", "temperature", "data.json")
@@ -33,16 +42,14 @@ MESI_IT = ["", "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
 
 # ─── Generazione temperatura casuale ─────────────────────────────────────────
 
-def genera_temperatura(tipo: str) -> str:
-    if tipo == "frigo":
-        temp = round(random.uniform(4.0, 6.0), 1)
+def genera_temperatura(frigo: dict) -> str:
+    temp = round(random.uniform(frigo["t_min"], frigo["t_max"]), 1)
+    if frigo["tipo"] == "frigo":
         return f"+{temp}"
-    else:  # freezer
-        temp = round(random.uniform(16.0, 18.0), 1)
+    else:
         return f"-{temp}"
 
 def genera_orario() -> str:
-    """Orario casuale tra 08:00 e 10:30"""
     minuti_totali = random.randint(8 * 60, 10 * 60 + 30)
     ore = minuti_totali // 60
     minuti = minuti_totali % 60
@@ -66,13 +73,16 @@ def salva_dati(dati: dict):
 def aggiungi_giorno(dati: dict, giorno: date) -> dict:
     chiave = giorno.isoformat()
     if chiave in dati:
-        return dati  # già compilato oggi
+        return dati  # già compilato
+
+    if not hotel_aperto(giorno):
+        return dati  # hotel chiuso: riga resta vuota
 
     riga = {
         "data":    giorno.strftime("%d/%m/%Y"),
         "orario":  genera_orario(),
         "temperature": {
-            str(f["numero"]): genera_temperatura(f["tipo"]) for f in FRIGHI
+            str(f["numero"]): genera_temperatura(f) for f in FRIGHI
         }
     }
     dati[chiave] = riga
@@ -84,7 +94,6 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     nome_mese = MESI_IT[mese]
     num_giorni = calendar.monthrange(anno, mese)[1]
 
-    # Costruisce le righe della tabella
     righe_html = ""
     for giorno_n in range(1, num_giorni + 1):
         giorno = date(anno, mese, giorno_n)
@@ -113,10 +122,8 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
             <td class="orario" {ora_attr}>{orario_str}</td>
             {celle_temp}
             <td class="firma"></td>
-            <td class="note" contenteditable="false"></td>
           </tr>"""
 
-    # Intestazioni frighi (compatte)
     intestazioni = ""
     for f in FRIGHI:
         intestazioni += f"""<th class="frigo-header">
@@ -144,7 +151,6 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     background: #fff;
   }}
 
-  /* Intestazione azienda */
   .hdr {{
     display: flex;
     justify-content: space-between;
@@ -161,7 +167,6 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
   .hdr-sub {{ font-size: 6pt; font-style: italic; color: #333; }}
   .hdr-mod  {{ font-size: 6pt; color: #666; white-space: nowrap; }}
 
-  /* Titolo */
   .titolo {{
     font-size: 9pt;
     font-weight: bold;
@@ -179,7 +184,6 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     margin-bottom: 1.5mm;
   }}
 
-  /* Tabella */
   table {{
     width: 100%;
     border-collapse: collapse;
@@ -191,20 +195,20 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     text-align: center;
     vertical-align: middle;
     line-height: 1.1;
+    overflow: hidden;
   }}
   thead th {{
     background: #cfe2f3;
     font-size: 5.5pt;
   }}
-  .frigo-header {{ width: 7.6%; }}
+  .frigo-header {{ width: 7%; }}
   .fn {{ font-size: 5.5pt; font-weight: bold; display: block; }}
   .fp {{ font-size: 4.5pt; color: #333; display: block; }}
   .fr {{ font-size: 4.5pt; color: #900; font-weight: bold; display: block; }}
 
-  .col-data   {{ width: 6%; }}
-  .col-ora    {{ width: 4.5%; }}
-  .col-firma  {{ width: 6%; }}
-  .col-note   {{ width: 7%; }}
+  .col-data  {{ width: 7%; }}
+  .col-ora   {{ width: 5%; }}
+  .col-firma {{ width: 18%; }}
 
   tbody tr {{ height: 4.8mm; }}
   tbody tr:nth-child(even) {{ background: #f7fbff; }}
@@ -214,9 +218,7 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
   td.temp   {{ font-size: 6.5pt; font-weight: bold; color: #154360; }}
   td.vuoto  {{ background: #fafafa; }}
   td.firma  {{ background: #fffde7; }}
-  td.note   {{ background: #fff8f8; font-size: 5pt; }}
 
-  /* Footer note */
   .footer {{
     margin-top: 1mm;
     font-size: 5pt;
@@ -226,7 +228,6 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     line-height: 1.4;
   }}
 
-  /* Bottoni (solo schermo) */
   @media screen {{
     .btn-wrap {{
       text-align: center;
@@ -276,6 +277,7 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     .edit-banner {{ display: none; }}
     body {{ font-size: 6pt; }}
     td[contenteditable] {{ outline: none !important; }}
+    table {{ page-break-inside: avoid; }}
   }}
 </style>
 </head>
@@ -295,7 +297,7 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
 <script>
 function attivaModifica() {{
   document.body.classList.add('edit-mode');
-  document.querySelectorAll('td.temp, td.orario, td.note').forEach(function(td) {{
+  document.querySelectorAll('td.temp, td.orario').forEach(function(td) {{
     td.setAttribute('contenteditable', 'true');
   }});
   document.getElementById('btnMod').style.display     = 'none';
@@ -353,7 +355,6 @@ function salvaDati() {{
       <th class="col-ora">ORA</th>
       {intestazioni}
       <th class="col-firma">FIRMA</th>
-      <th class="col-note">Note superamento<br>valori limite (*)</th>
     </tr>
   </thead>
   <tbody>
@@ -362,8 +363,8 @@ function salvaDati() {{
 </table>
 
 <div class="footer">
-  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi &nbsp;|&nbsp;
   NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). &nbsp;|&nbsp;
+  In caso di superamento: istruzione al personale / riparazione / regolazione / eventuale smaltimento alimenti. &nbsp;|&nbsp;
   Servizio e controllo HACCP: <strong>TS SICUREZZA S.r.l. - Trento</strong>
 </div>
 
@@ -396,10 +397,47 @@ def main(data_target: date = None):
     print(f"[Temperature] ✅ Aggiornato: {percorso}")
     return percorso
 
+def regen_storico():
+    """Rigenera tutto lo storico temperature dall'apertura stagione 2025 ad oggi."""
+    print("[Regen] Inizio rigenerazione storico temperature...")
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    inizio = date(2025, 4, 12)
+    fine   = date.today()
+
+    dati = {}
+    giorno = inizio
+    while giorno <= fine:
+        dati = aggiungi_giorno(dati, giorno)
+        giorno += timedelta(days=1)
+
+    salva_dati(dati)
+    print(f"[Regen] ✅ data.json: {len(dati)} giorni aperti salvati")
+
+    mesi_generati = set()
+    giorno = inizio
+    while giorno <= fine:
+        chiave_mese = (giorno.year, giorno.month)
+        if chiave_mese not in mesi_generati:
+            html = genera_html(giorno.year, giorno.month, dati)
+            nome_file = f"temperature_{giorno.year}_{giorno.month:02d}.html"
+            percorso  = os.path.join(OUTPUT_DIR, nome_file)
+            with open(percorso, "w", encoding="utf-8") as f:
+                f.write(html)
+            print(f"[Regen] ✅ {nome_file}")
+            mesi_generati.add(chiave_mese)
+        giorno += timedelta(days=1)
+
+    print(f"[Regen] Completato: {len(mesi_generati)} file HTML generati")
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        d = date.fromisoformat(sys.argv[1])
-        main(d)
+        if sys.argv[1] == "--regen":
+            regen_storico()
+        else:
+            d = date.fromisoformat(sys.argv[1])
+            main(d)
     else:
         main()
