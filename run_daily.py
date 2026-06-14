@@ -33,7 +33,7 @@ def main():
         data_target = date.today()
 
     print(f"\n{'='*60}")
-    print(f"  🏨  Holiday in Gardan — Autocompilazione HACCP")
+    print(f"  🏨  Holiday IV Gardan — Autocompilazione HACCP")
     print(f"  📅  Data: {data_target.strftime('%d/%m/%Y')}")
     print(f"{'='*60}\n")
 

@@ -320,7 +320,7 @@ def genera_html(piano: dict) -> str:
 </div>
 
 <div class="header-azienda">
-  <div class="nome">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan"</div>
+  <div class="nome">Villaggio Hotel &amp; Appartamenti "Holiday IV Gardan"</div>
   <div class="sottotitolo">Piano Autocontrollo Igienico Sanitario</div>
 </div>
 
