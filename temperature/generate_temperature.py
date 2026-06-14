@@ -27,8 +27,15 @@ FRIGHI = [
 
 # ─── Periodi di apertura hotel ────────────────────────────────────────────────
 PERIODI_APERTURA = [
-    (date(2025, 4, 12), date(2025, 11, 2)),
-    (date(2026, 4, 5),  date(2026, 12, 31)),
+    (date(2025,  4,  1), date(2025, 11, 16)),  # stagione estiva 2025
+    (date(2025, 12,  5), date(2025, 12,  8)),  # ponte dicembre
+    (date(2025, 12, 12), date(2025, 12, 15)),
+    (date(2025, 12, 19), date(2025, 12, 21)),
+    (date(2025, 12, 26), date(2026,  1, 13)),  # festività capodanno
+    (date(2026,  1, 23), date(2026,  1, 26)),
+    (date(2026,  2,  1), date(2026,  2,  8)),
+    (date(2026,  2, 13), date(2026,  2, 15)),
+    (date(2026,  3, 13), date(2026, 12, 31)),  # stagione 2026
 ]
 
 def hotel_aperto(giorno: date) -> bool:
@@ -403,7 +410,7 @@ def regen_storico():
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    inizio = date(2025, 4, 12)
+    inizio = date(2025, 4, 1)
     fine   = date.today()
 
     dati = {}
