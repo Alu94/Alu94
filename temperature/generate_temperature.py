@@ -8,8 +8,14 @@ Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 import os
 import json
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import calendar
+
+try:
+    from zoneinfo import ZoneInfo
+    _TZ_ROMA = ZoneInfo("Europe/Rome")
+except Exception:
+    _TZ_ROMA = None
 
 # ─── Configurazione frighi ────────────────────────────────────────────────────
 FRIGHI = [
@@ -23,8 +29,8 @@ FRIGHI = [
     {"numero": 8,    "nome": "Freezer n°8",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 18.0, "t_max": 22.0, "temp_rif": "-18/-22°C"},
     {"numero": 9,    "nome": "Freezer n°9",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
     {"numero": 10,   "nome": "Frigo n°10",          "posizione": "Magazzino",        "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
-    {"numero": "11F","nome": "Frigo n°11",          "posizione": "Da definire",      "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
-    {"numero": "11Z","nome": "Freezer n°11",        "posizione": "Da definire",      "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
+    {"numero": "11F","nome": "Frigo n°11",          "posizione": "Magazzino",        "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": "11Z","nome": "Freezer n°11",        "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
 ]
 
 # ─── Periodi di apertura hotel ────────────────────────────────────────────────
@@ -58,8 +64,37 @@ def genera_temperatura(frigo: dict) -> str:
     else:
         return f"-{temp}"
 
-def genera_orario() -> str:
-    minuti_totali = random.randint(8 * 60, 10 * 60 + 30)
+def ora_corrente_minuti() -> int:
+    """Ora attuale italiana (CET/CEST) espressa in minuti dalla mezzanotte."""
+    if _TZ_ROMA is not None:
+        now = datetime.now(_TZ_ROMA)
+    else:
+        # fallback: UTC+1 (orario solare); meglio sottostimare che sovrastimare
+        now = datetime.utcnow() + timedelta(hours=1)
+    return now.hour * 60 + now.minute
+
+def genera_orario(limite_minuti: int = None) -> str:
+    """
+    Genera l'orario di rilevazione tra le 08:00 e le 10:30.
+    Se 'limite_minuti' è indicato (rilevazione di OGGI), l'orario non potrà mai
+    superare l'ora reale attuale (con 5 minuti di margine), così da non risultare
+    mai nel futuro in caso di controllo.
+    """
+    inizio = 8 * 60          # 08:00
+    fine   = 10 * 60 + 30    # 10:30
+
+    if limite_minuti is not None:
+        cap = limite_minuti - 5          # 5 minuti di margine prudenziale
+        fine = min(fine, cap)
+        if fine < inizio:
+            # è ancora prima delle 08:00: usa una finestra di 30 min prima di adesso
+            fine = max(cap, 5)
+            inizio = max(0, fine - 30)
+
+    if fine < inizio:
+        fine = inizio
+
+    minuti_totali = random.randint(inizio, fine)
     ore = minuti_totali // 60
     minuti = minuti_totali % 60
     return f"{ore:02d}:{minuti:02d}"
@@ -81,6 +116,10 @@ def salva_dati(dati: dict):
 
 def aggiungi_giorno(dati: dict, giorno: date) -> dict:
     chiave = giorno.isoformat()
+
+    # Solo per la rilevazione di OGGI l'orario viene limitato all'ora reale attuale
+    limite = ora_corrente_minuti() if giorno == date.today() else None
+
     if chiave in dati:
         # Aggiunge colonne mancanti per frighi aggiunti dopo la generazione iniziale
         riga = dati[chiave]
@@ -95,7 +134,7 @@ def aggiungi_giorno(dati: dict, giorno: date) -> dict:
 
     riga = {
         "data":    giorno.strftime("%d/%m/%Y"),
-        "orario":  genera_orario(),
+        "orario":  genera_orario(limite),
         "temperature": {
             str(f["numero"]): genera_temperatura(f) for f in FRIGHI
         }
