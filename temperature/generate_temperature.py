@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-REGISTRAZIONE SETTIMANALE TEMPERATURE
+REGISTRAZIONE GIORNALIERA TEMPERATURE
 Genera/aggiorna il file HTML mensile delle temperature frigo/freezer.
 Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 """
@@ -8,22 +8,40 @@ Viene eseguito ogni giorno dal runner giornaliero (run_daily.py).
 import os
 import json
 import random
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import calendar
 
 # ─── Configurazione frighi ────────────────────────────────────────────────────
 FRIGHI = [
-    {"numero": 1,  "nome": "Frigo n°1",          "posizione": "Bar",              "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 2,  "nome": "Frigo n°2",           "posizione": "Vetrina Sala/Bar", "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 3,  "nome": "Frigo n°3",           "posizione": "Vetrina Servizio", "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 4,  "nome": "Freezer n°4",         "posizione": "Cucina",           "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 5,  "nome": "Frigo Grande n°5",    "posizione": "Cucina",           "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 6,  "nome": "Frigo Piccolo n°6",   "posizione": "Cucina",           "tipo": "frigo",   "temp_rif": "+4/6°C"},
-    {"numero": 7,  "nome": "Freezer n°7",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 8,  "nome": "Freezer n°8",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 9,  "nome": "Freezer n°9",         "posizione": "Magazzino",        "tipo": "freezer", "temp_rif": "-16/-18°C"},
-    {"numero": 10, "nome": "Frigo n°10",          "posizione": "Magazzino",        "tipo": "frigo",   "temp_rif": "+4/6°C"},
+    {"numero": 1,    "nome": "Frigo n°1",          "posizione": "Bar",              "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 2,    "nome": "Frigo n°2",           "posizione": "Vetrina Sala/Bar", "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 3,    "nome": "Frigo n°3",           "posizione": "Vetrina Servizio", "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 4,    "nome": "Freezer n°4",         "posizione": "Cucina",           "tipo": "freezer", "t_min": 15.0, "t_max": 17.0, "temp_rif": "-15/-17°C"},
+    {"numero": 5,    "nome": "Frigo Grande n°5",    "posizione": "Cucina",           "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 6,    "nome": "Frigo Piccolo n°6",   "posizione": "Cucina",           "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": 7,    "nome": "Freezer n°7",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
+    {"numero": 8,    "nome": "Freezer n°8",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 18.0, "t_max": 22.0, "temp_rif": "-18/-22°C"},
+    {"numero": 9,    "nome": "Freezer n°9",         "posizione": "Magazzino",        "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
+    {"numero": 10,   "nome": "Frigo n°10",          "posizione": "Magazzino",        "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": "11F","nome": "Frigo n°11",          "posizione": "Da definire",      "tipo": "frigo",   "t_min": 4.0,  "t_max": 6.0,  "temp_rif": "+4/6°C"},
+    {"numero": "11Z","nome": "Freezer n°11",        "posizione": "Da definire",      "tipo": "freezer", "t_min": 16.0, "t_max": 18.0, "temp_rif": "-16/-18°C"},
 ]
+
+# ─── Periodi di apertura hotel ────────────────────────────────────────────────
+PERIODI_APERTURA = [
+    (date(2025,  4,  1), date(2025, 11, 16)),  # stagione estiva 2025
+    (date(2025, 12,  5), date(2025, 12,  8)),  # ponte dicembre
+    (date(2025, 12, 12), date(2025, 12, 15)),
+    (date(2025, 12, 19), date(2025, 12, 21)),
+    (date(2025, 12, 26), date(2026,  1, 13)),  # festività capodanno
+    (date(2026,  1, 23), date(2026,  1, 26)),
+    (date(2026,  2,  1), date(2026,  2,  8)),
+    (date(2026,  2, 13), date(2026,  2, 15)),
+    (date(2026,  3, 13), date(2026, 12, 31)),  # stagione 2026
+]
+
+def hotel_aperto(giorno: date) -> bool:
+    return any(inizio <= giorno <= fine for inizio, fine in PERIODI_APERTURA)
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output", "temperature")
 DATA_FILE  = os.path.join(os.path.dirname(__file__), "..", "output", "temperature", "data.json")
@@ -33,16 +51,14 @@ MESI_IT = ["", "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
 
 # ─── Generazione temperatura casuale ─────────────────────────────────────────
 
-def genera_temperatura(tipo: str) -> str:
-    if tipo == "frigo":
-        temp = round(random.uniform(4.0, 6.0), 1)
+def genera_temperatura(frigo: dict) -> str:
+    temp = round(random.uniform(frigo["t_min"], frigo["t_max"]), 1)
+    if frigo["tipo"] == "frigo":
         return f"+{temp}"
-    else:  # freezer
-        temp = round(random.uniform(16.0, 18.0), 1)
+    else:
         return f"-{temp}"
 
 def genera_orario() -> str:
-    """Orario casuale tra 08:00 e 10:30"""
     minuti_totali = random.randint(8 * 60, 10 * 60 + 30)
     ore = minuti_totali // 60
     minuti = minuti_totali % 60
@@ -66,13 +82,22 @@ def salva_dati(dati: dict):
 def aggiungi_giorno(dati: dict, giorno: date) -> dict:
     chiave = giorno.isoformat()
     if chiave in dati:
-        return dati  # già compilato
+        # Aggiunge colonne mancanti per frighi aggiunti dopo la generazione iniziale
+        riga = dati[chiave]
+        for f in FRIGHI:
+            k = str(f["numero"])
+            if k not in riga.get("temperature", {}):
+                riga.setdefault("temperature", {})[k] = genera_temperatura(f)
+        return dati
+
+    if not hotel_aperto(giorno):
+        return dati  # hotel chiuso: riga resta vuota
 
     riga = {
         "data":    giorno.strftime("%d/%m/%Y"),
         "orario":  genera_orario(),
         "temperature": {
-            str(f["numero"]): genera_temperatura(f["tipo"]) for f in FRIGHI
+            str(f["numero"]): genera_temperatura(f) for f in FRIGHI
         }
     }
     dati[chiave] = riga
@@ -84,206 +109,278 @@ def genera_html(anno: int, mese: int, dati: dict) -> str:
     nome_mese = MESI_IT[mese]
     num_giorni = calendar.monthrange(anno, mese)[1]
 
-    # Costruisce le righe della tabella
     righe_html = ""
     for giorno_n in range(1, num_giorni + 1):
         giorno = date(anno, mese, giorno_n)
         chiave = giorno.isoformat()
-        riga = dati.get(chiave)
+        riga   = dati.get(chiave)
 
         if riga:
             data_str   = riga["data"]
             orario_str = riga["orario"]
             celle_temp = "".join(
-                f'<td class="temp">{riga["temperature"].get(str(f["numero"]), "")}</td>'
+                f'<td class="temp" contenteditable="false" data-key="{chiave}" data-frigo="{f["numero"]}">{riga["temperature"].get(str(f["numero"]), "")}</td>'
                 for f in FRIGHI
             )
-            firma_cell = '<td class="firma"></td>'
-            note_cell  = '<td class="note"></td>'
+            ora_attr = f'contenteditable="false" data-key="{chiave}" data-campo="orario"'
         else:
             data_str   = giorno.strftime("%d/%m/%Y")
             orario_str = ""
-            celle_temp = "".join('<td class="temp future"></td>' for _ in FRIGHI)
-            firma_cell = '<td class="firma"></td>'
-            note_cell  = '<td class="note"></td>'
+            celle_temp = "".join(
+                f'<td class="temp vuoto" contenteditable="false" data-key="{chiave}" data-frigo="{f["numero"]}"></td>'
+                for f in FRIGHI
+            )
+            ora_attr = f'contenteditable="false" data-key="{chiave}" data-campo="orario"'
 
-        righe_html += f"""
-        <tr>
+        righe_html += f"""<tr>
             <td class="data">{data_str}</td>
-            <td class="orario">{orario_str}</td>
+            <td class="orario" {ora_attr}>{orario_str}</td>
             {celle_temp}
-            {firma_cell}
-            {note_cell}
-        </tr>"""
+            <td class="firma"></td>
+          </tr>"""
 
-    # Intestazioni frighi
     intestazioni = ""
     for f in FRIGHI:
-        intestazioni += f"""
-            <th class="frigo-header">
-                <div class="frigo-nome">{f['nome']}</div>
-                <div class="frigo-pos">{f['posizione']}</div>
-                <div class="frigo-rif">Temp rif. {f['temp_rif']}</div>
-            </th>"""
+        intestazioni += f"""<th class="frigo-header">
+            <span class="fn">{f['nome']}</span><br>
+            <span class="fp">{f['posizione']}</span><br>
+            <span class="fr">{f['temp_rif']}</span>
+          </th>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrazione Temperature - {nome_mese} {anno}</title>
+<title>Temperature - {nome_mese} {anno}</title>
 <style>
   @page {{
     size: A4 landscape;
-    margin: 10mm 8mm;
+    margin: 6mm 5mm;
   }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
   body {{
     font-family: Arial, sans-serif;
-    font-size: 7.5pt;
+    font-size: 6pt;
     color: #000;
     background: #fff;
   }}
-  .header-azienda {{
-    text-align: center;
-    margin-bottom: 6px;
-  }}
-  .header-azienda .nome {{
-    font-size: 11pt;
-    font-weight: bold;
-    text-transform: uppercase;
-  }}
-  .header-azienda .sottotitolo {{
-    font-size: 8pt;
-    font-style: italic;
-  }}
-  .doc-info {{
+
+  .hdr {{
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 4px;
+    align-items: flex-start;
+    margin-bottom: 1mm;
   }}
-  .doc-info .mod {{ font-size: 7pt; color: #555; }}
-  .titolo-tabella {{
-    font-size: 12pt;
+  .hdr-centro {{ text-align: center; flex: 1; }}
+  .hdr-nome {{
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }}
+  .hdr-sub {{ font-size: 6pt; font-style: italic; color: #333; }}
+  .hdr-mod  {{ font-size: 6pt; color: #666; white-space: nowrap; }}
+
+  .titolo {{
+    font-size: 9pt;
     font-weight: bold;
     text-align: center;
     text-transform: uppercase;
-    border: 2px solid #000;
-    padding: 4px;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+    border: 1.5px solid #000;
+    padding: 1.5mm 2mm;
+    margin: 1mm 0;
+    letter-spacing: 0.5px;
   }}
   .mese-anno {{
     text-align: center;
-    font-size: 9pt;
+    font-size: 7.5pt;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 1.5mm;
   }}
+
   table {{
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
   }}
   th, td {{
-    border: 1px solid #333;
-    padding: 2px 1px;
+    border: 0.4pt solid #444;
+    padding: 0.4mm 0.3mm;
     text-align: center;
     vertical-align: middle;
+    line-height: 1.1;
+    overflow: hidden;
   }}
-  th {{
-    background-color: #d0e4f7;
-    font-weight: bold;
+  thead th {{
+    background: #cfe2f3;
+    font-size: 5.5pt;
   }}
-  .frigo-header {{
-    width: 8%;
+  .frigo-header {{ width: 6.2%; }}
+  .fn {{ font-size: 5.5pt; font-weight: bold; display: block; }}
+  .fp {{ font-size: 4.5pt; color: #333; display: block; }}
+  .fr {{ font-size: 4.5pt; color: #900; font-weight: bold; display: block; }}
+
+  .col-data  {{ width: 6%; }}
+  .col-ora   {{ width: 4%; }}
+  .col-firma {{ width: 13%; }}
+
+  tbody tr {{ height: 4.8mm; }}
+  tbody tr:nth-child(even) {{ background: #f7fbff; }}
+
+  td.data   {{ font-size: 6pt; font-weight: bold; }}
+  td.orario {{ font-size: 6pt; }}
+  td.temp   {{ font-size: 6.5pt; font-weight: bold; color: #154360; }}
+  td.vuoto  {{ background: #fafafa; }}
+  td.firma  {{ background: #fffde7; }}
+
+  .footer {{
+    margin-top: 1mm;
+    font-size: 5pt;
+    color: #444;
+    border-top: 0.4pt solid #999;
+    padding-top: 0.8mm;
+    line-height: 1.4;
   }}
-  .frigo-nome {{ font-size: 6.5pt; font-weight: bold; }}
-  .frigo-pos  {{ font-size: 5.5pt; color: #333; }}
-  .frigo-rif  {{ font-size: 5.5pt; color: #c00; font-weight: bold; }}
-  .col-data   {{ width: 7%; }}
-  .col-orario {{ width: 5%; }}
-  .col-firma  {{ width: 7%; }}
-  .col-note   {{ width: 9%; }}
-  td.data     {{ font-size: 7pt; font-weight: bold; }}
-  td.orario   {{ font-size: 7pt; }}
-  td.temp     {{ font-size: 7.5pt; font-weight: bold; color: #1a5276; }}
-  td.future   {{ background: #f9f9f9; }}
-  td.firma    {{ background: #fffde7; }}
-  td.note     {{ background: #fff8f8; font-size: 6pt; text-align: left; padding: 1px 2px; }}
-  .note-footer {{
-    margin-top: 8px;
-    font-size: 6.5pt;
-    color: #333;
-    border-top: 1px solid #999;
-    padding-top: 4px;
+
+  @media screen {{
+    .btn-wrap {{
+      text-align: center;
+      padding: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }}
+    .btn {{
+      padding: 7px 18px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10pt;
+      font-weight: bold;
+    }}
+    .btn-stampa   {{ background: #154360; color: #fff; }}
+    .btn-modifica {{ background: #e67e22; color: #fff; }}
+    .btn-salva    {{ background: #27ae60; color: #fff; display: none; }}
+    .btn-annulla  {{ background: #c0392b; color: #fff; display: none; }}
+
+    body.edit-mode td[contenteditable="true"] {{
+      background: #fff9e6 !important;
+      outline: 1.5px dashed #e67e22;
+      cursor: text;
+    }}
+    body.edit-mode td[contenteditable="true"]:focus {{
+      background: #fffbe6 !important;
+      outline: 2px solid #e67e22;
+    }}
+    .edit-banner {{
+      display: none;
+      background: #fef9e7;
+      border: 1.5px solid #e67e22;
+      color: #784212;
+      font-size: 8.5pt;
+      padding: 4px 10px;
+      text-align: center;
+      border-radius: 4px;
+      margin: 4px 0;
+    }}
+    body.edit-mode .edit-banner {{ display: block; }}
   }}
   @media print {{
-    body {{ font-size: 7pt; }}
-    .no-print {{ display: none; }}
+    .btn-wrap    {{ display: none; }}
+    .edit-banner {{ display: none; }}
+    body {{ font-size: 6pt; }}
+    td[contenteditable] {{ outline: none !important; }}
     table {{ page-break-inside: avoid; }}
-    tr {{ page-break-inside: avoid; }}
-  }}
-  .btn-stampa {{
-    display: inline-block;
-    margin: 10px 0;
-    padding: 8px 20px;
-    background: #1a5276;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 10pt;
   }}
 </style>
 </head>
 <body>
 
-<div class="no-print" style="text-align:center; padding: 8px;">
-  <button class="btn-stampa" onclick="window.print()">🖨️ Stampa / Salva PDF</button>
+<div class="btn-wrap">
+  <button class="btn btn-stampa"   onclick="window.print()">🖨️ Stampa / Salva PDF</button>
+  <button class="btn btn-modifica" id="btnMod"     onclick="attivaModifica()">✏️ Modifica dati</button>
+  <button class="btn btn-salva"    id="btnSalva"   onclick="salvaDati()">💾 Scarica dati aggiornati</button>
+  <button class="btn btn-annulla"  id="btnAnnulla" onclick="location.reload()">✖ Annulla</button>
+</div>
+<div class="edit-banner">
+  ✏️ <strong>Modalità modifica attiva</strong> — clicca su qualsiasi temperatura o orario per correggerlo.
+  Quando hai finito clicca <strong>💾 Scarica dati aggiornati</strong> e carica il file <code>data.json</code> su GitHub in <code>output/temperature/</code>.
 </div>
 
-<div class="header-azienda">
-  <div class="nome">Villaggio Hotel &amp; Appartamenti "Holiday in Gardan"</div>
-  <div class="sottotitolo">Piano Autocontrollo Igienico Sanitario</div>
+<script>
+function attivaModifica() {{
+  document.body.classList.add('edit-mode');
+  document.querySelectorAll('td.temp, td.orario').forEach(function(td) {{
+    td.setAttribute('contenteditable', 'true');
+  }});
+  document.getElementById('btnMod').style.display     = 'none';
+  document.getElementById('btnSalva').style.display   = 'inline-block';
+  document.getElementById('btnAnnulla').style.display = 'inline-block';
+}}
+
+function salvaDati() {{
+  var dati = {{}};
+
+  document.querySelectorAll('td.orario[data-key]').forEach(function(td) {{
+    var k = td.dataset.key;
+    if (!dati[k]) dati[k] = {{ data: '', orario: '', temperature: {{}} }};
+    dati[k].orario = td.innerText.trim();
+    dati[k].data   = td.previousElementSibling ? td.previousElementSibling.innerText.trim() : '';
+  }});
+
+  document.querySelectorAll('td.temp[data-key]').forEach(function(td) {{
+    var k  = td.dataset.key;
+    var fr = td.dataset.frigo;
+    if (!dati[k]) dati[k] = {{ data: '', orario: '', temperature: {{}} }};
+    if (!dati[k].temperature) dati[k].temperature = {{}};
+    var val = td.innerText.trim();
+    if (val) dati[k].temperature[fr] = val;
+  }});
+
+  var blob = new Blob([JSON.stringify(dati, null, 2)], {{type: 'application/json'}});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+
+  setTimeout(function() {{
+    alert('✅ File data.json scaricato!\\n\\nOra vai su GitHub:\\ngithub.com/Alu94/haccp-holiday-gardan\\n→ output/temperature/data.json\\n→ ✏️ icona matita → incolla il contenuto → Commit');
+  }}, 500);
+}}
+</script>
+
+<div class="hdr">
+  <span class="hdr-mod">Mod. 10</span>
+  <div class="hdr-centro">
+    <div class="hdr-nome">Villaggio Hotel &amp; Appartamenti "Holiday IV Gardan"</div>
+    <div class="hdr-sub">Piano Autocontrollo Igienico Sanitario</div>
+  </div>
+  <span class="hdr-mod">&nbsp;</span>
 </div>
 
-<div class="doc-info">
-  <span class="mod">Mod. 10</span>
-  <span></span>
-</div>
-
-<div class="titolo-tabella">Registrazione Settimanale Temperature</div>
+<div class="titolo">Registrazione Giornaliera Temperature</div>
 <div class="mese-anno">{nome_mese} {anno}</div>
 
 <table>
-  <colgroup>
-    <col class="col-data">
-    <col class="col-orario">
-    {"".join('<col class="col-frigo">' for _ in FRIGHI)}
-    <col class="col-firma">
-    <col class="col-note">
-  </colgroup>
   <thead>
     <tr>
-      <th rowspan="2" class="col-data">DATA</th>
-      <th rowspan="2" class="col-orario">ORA</th>
+      <th class="col-data">DATA</th>
+      <th class="col-ora">ORA</th>
       {intestazioni}
-      <th rowspan="2" class="col-firma">FIRMA</th>
-      <th rowspan="2" class="col-note">Note in caso di<br>superamento valori limite (*)</th>
+      <th class="col-firma">FIRMA</th>
     </tr>
-    <tr><!-- seconda riga header già occupata da rowspan --></tr>
   </thead>
   <tbody>
     {righe_html}
   </tbody>
 </table>
 
-<div class="note-footer">
-  (*) Istruzione al personale / riparazione / sostituzione apparecchio / regolazione del refrigeratore / eventuale smaltimento dei cibi<br>
-  NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). In tal caso si verificherà la qualità delle materie prime e si procederà ad apposita taratura.<br>
-  <br>
-  Servizio e controllo HACCP realizzato in collaborazione con: <strong>TS SICUREZZA S.r.l. - Trento</strong>
+<div class="footer">
+  NB. Sono possibili limitati e brevi rialzi termici incidentali (max +3°C). &nbsp;|&nbsp;
+  In caso di superamento: istruzione al personale / riparazione / regolazione / eventuale smaltimento alimenti. &nbsp;|&nbsp;
+  Servizio e controllo HACCP: <strong>TS SICUREZZA S.r.l. - Trento</strong>
 </div>
 
 </body>
@@ -296,18 +393,15 @@ def main(data_target: date = None):
     if data_target is None:
         data_target = date.today()
 
-    anno  = data_target.year
-    mese  = data_target.month
+    anno = data_target.year
+    mese = data_target.month
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Carica dati esistenti e aggiunge il giorno odierno
     dati = carica_dati()
     dati = aggiungi_giorno(dati, data_target)
     salva_dati(dati)
 
-    # Filtra solo i dati del mese corrente (per chiarezza nell'HTML)
-    # ma passa tutti i dati: la funzione HTML accede solo al mese/anno richiesto
     html = genera_html(anno, mese, dati)
 
     nome_file = f"temperature_{anno}_{mese:02d}.html"
@@ -318,11 +412,47 @@ def main(data_target: date = None):
     print(f"[Temperature] ✅ Aggiornato: {percorso}")
     return percorso
 
+def regen_storico():
+    """Rigenera tutto lo storico temperature dall'apertura stagione 2025 ad oggi."""
+    print("[Regen] Inizio rigenerazione storico temperature...")
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    inizio = date(2025, 4, 1)
+    fine   = date.today()
+
+    dati = {}
+    giorno = inizio
+    while giorno <= fine:
+        dati = aggiungi_giorno(dati, giorno)
+        giorno += timedelta(days=1)
+
+    salva_dati(dati)
+    print(f"[Regen] ✅ data.json: {len(dati)} giorni aperti salvati")
+
+    mesi_generati = set()
+    giorno = inizio
+    while giorno <= fine:
+        chiave_mese = (giorno.year, giorno.month)
+        if chiave_mese not in mesi_generati:
+            html = genera_html(giorno.year, giorno.month, dati)
+            nome_file = f"temperature_{giorno.year}_{giorno.month:02d}.html"
+            percorso  = os.path.join(OUTPUT_DIR, nome_file)
+            with open(percorso, "w", encoding="utf-8") as f:
+                f.write(html)
+            print(f"[Regen] ✅ {nome_file}")
+            mesi_generati.add(chiave_mese)
+        giorno += timedelta(days=1)
+
+    print(f"[Regen] Completato: {len(mesi_generati)} file HTML generati")
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
-        # es: python generate_temperature.py 2026-05-25
-        d = date.fromisoformat(sys.argv[1])
-        main(d)
+        if sys.argv[1] == "--regen":
+            regen_storico()
+        else:
+            d = date.fromisoformat(sys.argv[1])
+            main(d)
     else:
         main()
