@@ -428,6 +428,29 @@ function salvaDati() {{
 
 # ─── Entry point ─────────────────────────────────────────────────────────────
 
+def backfill_mancanti(dati: dict) -> set:
+    """
+    Scorre tutti i giorni esistenti e aggiunge le colonne di frighi/freezer
+    che sono stati inseriti dopo la generazione della riga.
+    Ritorna il set di (anno, mese) toccati per rigenerare gli HTML relativi.
+    """
+    mesi_toccati = set()
+    for chiave, riga in dati.items():
+        temp = riga.setdefault("temperature", {})
+        modificato = False
+        for f in FRIGHI:
+            k = str(f["numero"])
+            if k not in temp:
+                temp[k] = genera_temperatura(f)
+                modificato = True
+        if modificato:
+            try:
+                d = date.fromisoformat(chiave)
+                mesi_toccati.add((d.year, d.month))
+            except ValueError:
+                pass
+    return mesi_toccati
+
 def main(data_target: date = None):
     if data_target is None:
         data_target = date.today()
@@ -438,18 +461,29 @@ def main(data_target: date = None):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     dati = carica_dati()
+
+    # 1. Backfill colonne mancanti su tutto lo storico
+    mesi_da_rigenerare = backfill_mancanti(dati)
+
+    # 2. Aggiungi la rilevazione di oggi
     dati = aggiungi_giorno(dati, data_target)
     salva_dati(dati)
 
-    html = genera_html(anno, mese, dati)
+    # 3. Rigenera SEMPRE l'HTML del mese corrente
+    mesi_da_rigenerare.add((anno, mese))
 
-    nome_file = f"temperature_{anno}_{mese:02d}.html"
-    percorso  = os.path.join(OUTPUT_DIR, nome_file)
-    with open(percorso, "w", encoding="utf-8") as f:
-        f.write(html)
+    percorso_corrente = None
+    for (a, m) in sorted(mesi_da_rigenerare):
+        html = genera_html(a, m, dati)
+        nome_file = f"temperature_{a}_{m:02d}.html"
+        percorso  = os.path.join(OUTPUT_DIR, nome_file)
+        with open(percorso, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"[Temperature] ✅ Aggiornato: {percorso}")
+        if (a, m) == (anno, mese):
+            percorso_corrente = percorso
 
-    print(f"[Temperature] ✅ Aggiornato: {percorso}")
-    return percorso
+    return percorso_corrente
 
 def regen_storico():
     """Rigenera tutto lo storico temperature dall'apertura stagione 2025 ad oggi."""
